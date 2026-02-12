@@ -111,6 +111,84 @@
             font-weight: 300;
         }
 
+        .search-container {
+            max-width: 600px;
+            margin: 2rem auto;
+            position: relative;
+        }
+
+        .search-box {
+            width: 100%;
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 50px;
+            padding: 1rem 3.5rem 1rem 1.5rem;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .search-box::placeholder {
+            color: var(--text-secondary);
+            opacity: 0.6;
+        }
+
+        .search-box:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 20px var(--primary-glow);
+            background: var(--bg-card-hover);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 1.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary);
+            font-size: 1.5rem;
+            pointer-events: none;
+        }
+
+        .search-results-info {
+            text-align: center;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .search-results-info .highlight {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .clear-search {
+            position: absolute;
+            right: 4rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.3rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            transition: all 0.2s ease;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .clear-search.visible {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .clear-search:hover {
+            color: var(--primary);
+            transform: translateY(-50%) scale(1.2);
+        }
+
         .stats-bar {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -431,6 +509,20 @@
             <p class="subtitle">Live Player Dashboard</p>
         </header>
 
+        <div class="search-container">
+            <input 
+                type="text" 
+                id="searchBox" 
+                class="search-box" 
+                placeholder="Cerca giocatore per nome, ID o identificatore..."
+                autocomplete="off"
+            >
+            <button class="clear-search" id="clearSearch" onclick="clearSearch()">✕</button>
+            <span class="search-icon">🔍</span>
+        </div>
+
+        <div id="searchInfo" class="search-results-info"></div>
+
         <div class="stats-bar" id="statsBar">
             <div class="stat-card">
                 <div class="stat-label">Giocatori Online</div>
@@ -455,7 +547,7 @@
 
         <div class="auto-refresh">
             <span class="refresh-indicator"></span>
-            <span>Aggiornamento automatico ogni 5 secondi</span>
+            <span>Aggiornamento automatico ogni 30 secondi</span>
         </div>
     </div>
 
@@ -467,6 +559,8 @@
             ? 'http://45.138.200.204:30120/players.json'
             : '/api/players';
         let lastFetchTime = null;
+        let allPlayers = []; // Store all players for search
+        let searchQuery = '';
 
         function getPingClass(ping) {
             if (ping < 50) return 'ping-good';
@@ -498,6 +592,105 @@
             }
         }
 
+        function filterPlayers(players, query) {
+            if (!query) return players;
+            
+            const lowerQuery = query.toLowerCase();
+            return players.filter(player => {
+                // Search in name
+                if (player.name && player.name.toLowerCase().includes(lowerQuery)) {
+                    return true;
+                }
+                
+                // Search in ID
+                if (player.id.toString().includes(lowerQuery)) {
+                    return true;
+                }
+                
+                // Search in identifiers
+                if (player.identifiers && player.identifiers.some(id => 
+                    id.toLowerCase().includes(lowerQuery)
+                )) {
+                    return true;
+                }
+                
+                return false;
+            });
+        }
+
+        function updateSearchInfo(totalPlayers, filteredPlayers) {
+            const searchInfo = document.getElementById('searchInfo');
+            const clearBtn = document.getElementById('clearSearch');
+            
+            if (searchQuery) {
+                searchInfo.innerHTML = `Trovati <span class="highlight">${filteredPlayers}</span> di ${totalPlayers} giocatori`;
+                clearBtn.classList.add('visible');
+            } else {
+                searchInfo.innerHTML = '';
+                clearBtn.classList.remove('visible');
+            }
+        }
+
+        function clearSearch() {
+            document.getElementById('searchBox').value = '';
+            searchQuery = '';
+            renderPlayers(allPlayers);
+        }
+
+        function renderPlayers(players) {
+            const container = document.getElementById('playersContainer');
+            const filteredPlayers = filterPlayers(players, searchQuery);
+            
+            updateSearchInfo(players.length, filteredPlayers.length);
+            
+            if (filteredPlayers.length === 0) {
+                if (searchQuery) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">🔍</div>
+                            <h2>Nessun risultato</h2>
+                            <p>Nessun giocatore trovato per "${searchQuery}"</p>
+                        </div>
+                    `;
+                } else {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">👥</div>
+                            <h2>Nessun giocatore online</h2>
+                            <p>Il server è attualmente vuoto</p>
+                        </div>
+                    `;
+                }
+                return;
+            }
+            
+            const playersHTML = filteredPlayers.map(player => `
+                <div class="player-card">
+                    <div class="player-header">
+                        <span class="player-id">ID ${player.id}</span>
+                        <div class="player-ping">
+                            <span class="ping-dot ${getPingClass(player.ping)}"></span>
+                            ${player.ping}ms
+                        </div>
+                    </div>
+                    <h3 class="player-name">${player.name || 'Unknown Player'}</h3>
+                    <div class="player-identifiers">
+                        ${player.identifiers.map(id => {
+                            const formatted = formatIdentifier(id);
+                            return `
+                                <div class="identifier">
+                                    <span class="identifier-label">${formatted.label}</span>
+                                    <span class="identifier-value">${formatted.value}</span>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+            `).join('');
+            
+            container.innerHTML = `<div class="players-grid">${playersHTML}</div>`;
+        }
+
         async function fetchPlayers() {
             try {
                 const response = await fetch(API_URL);
@@ -510,6 +703,8 @@
                 lastFetchTime = new Date();
                 updateLastUpdateTime();
                 
+                allPlayers = players; // Store for search
+                
                 // Update stats
                 document.getElementById('playerCount').textContent = players.length;
                 
@@ -518,45 +713,8 @@
                     : 0;
                 document.getElementById('avgPing').innerHTML = `${avgPing}<span style="font-size: 1rem;">ms</span>`;
                 
-                // Render players
-                const container = document.getElementById('playersContainer');
-                
-                if (players.length === 0) {
-                    container.innerHTML = `
-                        <div class="empty-state">
-                            <div class="empty-state-icon">👥</div>
-                            <h2>Nessun giocatore online</h2>
-                            <p>Il server è attualmente vuoto</p>
-                        </div>
-                    `;
-                    return;
-                }
-                
-                const playersHTML = players.map(player => `
-                    <div class="player-card">
-                        <div class="player-header">
-                            <span class="player-id">ID ${player.id}</span>
-                            <div class="player-ping">
-                                <span class="ping-dot ${getPingClass(player.ping)}"></span>
-                                ${player.ping}ms
-                            </div>
-                        </div>
-                        <h3 class="player-name">${player.name || 'Unknown Player'}</h3>
-                        <div class="player-identifiers">
-                            ${player.identifiers.map(id => {
-                                const formatted = formatIdentifier(id);
-                                return `
-                                    <div class="identifier">
-                                        <span class="identifier-label">${formatted.label}</span>
-                                        <span class="identifier-value">${formatted.value}</span>
-                                    </div>
-                                `;
-                            }).join('')}
-                        </div>
-                    </div>
-                `).join('');
-                
-                container.innerHTML = `<div class="players-grid">${playersHTML}</div>`;
+                // Render players with current search
+                renderPlayers(players);
                 
             } catch (error) {
                 console.error('Error fetching players:', error);
@@ -570,11 +728,20 @@
             }
         }
 
+        // Search input handler
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchBox = document.getElementById('searchBox');
+            searchBox.addEventListener('input', function(e) {
+                searchQuery = e.target.value;
+                renderPlayers(allPlayers);
+            });
+        });
+
         // Initial fetch
         fetchPlayers();
         
-        // Auto-refresh every 5 seconds
-        setInterval(fetchPlayers, 5000);
+        // Auto-refresh every 30 seconds (changed from 5)
+        setInterval(fetchPlayers, 30000);
         
         // Update time display every second
         setInterval(updateLastUpdateTime, 1000);

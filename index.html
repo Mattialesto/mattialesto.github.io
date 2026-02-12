@@ -75,7 +75,7 @@ async function fetchPlayers() {
     const loader = document.getElementById("loader");
     const table = document.getElementById("playersTable");
     try {
-        const response = await fetch("http://45.138.200.204:30120/players.json");
+        const response = await fetch("https://player.mattialesto.workers.dev");
         const players = await response.json();
 
         if (!players || players.length === 0) {

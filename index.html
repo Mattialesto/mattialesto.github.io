@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FiveM Players Dashboard</title>
+    <title>Wild Lands Players Dashboard</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet">
@@ -505,7 +505,7 @@
     
     <div class="container">
         <header>
-            <h1 class="logo">FiveM Server</h1>
+            <h1 class="logo">Wild Lands Server</h1>
             <p class="subtitle">Live Player Dashboard</p>
         </header>
 
@@ -740,8 +740,8 @@
         // Initial fetch
         fetchPlayers();
         
-        // Auto-refresh every 30 seconds (changed from 5)
-        setInterval(fetchPlayers, 30000);
+        // Auto-refresh every 60 seconds (changed from 5)
+        setInterval(fetchPlayers, 60000);
         
         // Update time display every second
         setInterval(updateLastUpdateTime, 1000);

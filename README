@@ -1,0 +1,146 @@
+# FiveM Player Dashboard 🎮
+
+Una dashboard moderna e intuitiva per visualizzare i giocatori online del tuo server FiveM in tempo reale.
+
+## ✨ Caratteristiche
+
+- 🎨 Design moderno con estetica cyber/gaming
+- 🔄 Aggiornamento automatico ogni 5 secondi
+- 📊 Statistiche in tempo reale (giocatori online, ping medio)
+- 🎯 Visualizzazione dettagliata di ogni giocatore
+- 📱 Design responsive per mobile e desktop
+- ⚡ Animazioni fluide e micro-interazioni
+
+## 🚀 Deploy su Render
+
+### Opzione 1: Deploy tramite GitHub (Consigliato)
+
+1. **Crea un repository su GitHub**
+   - Vai su https://github.com/new
+   - Crea un nuovo repository (pubblico o privato)
+   - NON aggiungere README, .gitignore o license
+
+2. **Carica i file**
+   ```bash
+   git init
+   git add .
+   git commit -m "Initial commit"
+   git branch -M main
+   git remote add origin https://github.com/TUO-USERNAME/TUO-REPO.git
+   git push -u origin main
+   ```
+
+3. **Deploy su Render**
+   - Vai su https://render.com e crea un account (gratis)
+   - Clicca su "New +" → "Web Service"
+   - Connetti il tuo repository GitHub
+   - Configura:
+     - **Name**: fivem-dashboard (o come preferisci)
+     - **Environment**: Node
+     - **Build Command**: `npm install`
+     - **Start Command**: `npm start`
+     - **Plan**: Free
+   - Clicca "Create Web Service"
+
+### Opzione 2: Deploy diretto (senza GitHub)
+
+1. Vai su https://render.com
+2. Clicca su "New +" → "Web Service"
+3. Seleziona "Deploy from Git repository" o usa Render CLI
+4. Carica i file del progetto
+5. Configura come sopra
+
+## 🛠️ Test Locale
+
+Prima di fare il deploy, puoi testare in locale:
+
+```bash
+# Installa le dipendenze
+npm install
+
+# Avvia il server
+npm start
+
+# Apri il browser su
+http://localhost:3000
+```
+
+## 📁 Struttura File
+
+```
+.
+├── index.html      # Dashboard frontend
+├── server.js       # Server Express con proxy CORS
+├── package.json    # Dipendenze Node.js
+└── README.md       # Questo file
+```
+
+## 🔧 Come Funziona
+
+1. **Frontend (index.html)**: Dashboard moderna con design gaming
+2. **Backend (server.js)**: Server Express che:
+   - Serve il file HTML
+   - Fornisce un endpoint proxy `/api/players` per evitare problemi CORS
+   - Inoltra le richieste al server FiveM
+
+3. **Auto-switch intelligente**: 
+   - In locale: connessione diretta al server FiveM
+   - Su Render: usa il proxy per evitare CORS
+
+## 🎨 Personalizzazione
+
+Puoi personalizzare facilmente:
+
+### Colori (nel file index.html, sezione CSS `:root`)
+```css
+--primary: #00ff88;        /* Colore primario */
+--secondary: #00d4ff;      /* Colore secondario */
+--bg-dark: #0a0e1a;        /* Sfondo principale */
+```
+
+### Intervallo aggiornamento
+```javascript
+// Cambia 5000 (5 secondi) con il valore desiderato in millisecondi
+setInterval(fetchPlayers, 5000);
+```
+
+### URL Server FiveM
+Nel file `server.js`, modifica:
+```javascript
+const response = await fetch('http://45.138.200.204:30120/players.json');
+```
+
+## 🌐 Dopo il Deploy
+
+Una volta completato il deploy su Render:
+
+1. Riceverai un URL tipo: `https://tuo-progetto.onrender.com`
+2. La dashboard sarà accessibile pubblicamente
+3. Si aggiornerà automaticamente ogni 5 secondi
+4. Render terrà il servizio attivo gratuitamente (con possibile sleep dopo 15 min di inattività sul piano free)
+
+## 💡 Note
+
+- **Piano Free di Render**: Il servizio si spegne dopo 15 minuti di inattività e impiega ~30 secondi a riavviarsi alla prima visita
+- **Upgrade**: Considera il piano a pagamento ($7/mese) per tenere il servizio sempre attivo
+- **CORS**: Il server proxy risolve automaticamente i problemi CORS
+
+## 🐛 Troubleshooting
+
+**La dashboard non carica i dati?**
+- Verifica che il server FiveM sia online e raggiungibile
+- Controlla la console del browser (F12) per eventuali errori
+- Verifica che l'URL del server FiveM sia corretto in `server.js`
+
+**Deploy fallito su Render?**
+- Verifica che tutti i file siano stati caricati
+- Controlla i log su Render per vedere l'errore specifico
+- Assicurati che `package.json` contenga tutte le dipendenze
+
+## 📝 Licenza
+
+MIT - Usa e modifica liberamente!
+
+---
+
+Made with ❤️ for the FiveM community

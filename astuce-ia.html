@@ -116,7 +116,7 @@
       <h2>Le prompt à copier</h2>
       <button type="button" class="btn go" id="copyBtn">Copier le prompt</button>
     </div>
-    <p>Après l'avoir collé, remplace les 3 passages <mark>surlignés entre parenthèses</mark> par les infos de ton cours. Tu peux aussi changer le nombre de questions.</p>
+    <p>Après l'avoir collé, remplace les passages <mark>surlignés entre parenthèses</mark> par les infos de ton cours. Tu peux aussi changer les nombres : 40 quiz au lieu de 20, 20 mimes au lieu de 8…</p>
     <pre class="prompt" id="prompt" style="white-space:pre-wrap;overflow-wrap:anywhere">Tu vas m'aider à créer un fichier de questions pour le jeu de plateau Classe Party.
 
 Je t'ai joint le fichier modèle « modele-questions.txt ». Respecte scrupuleusement son format :
@@ -128,6 +128,7 @@ Je t'ai joint le fichier modèle « modele-questions.txt ». Respecte scrupuleus
 Mon cours : <mark>(matière et sujet, ex. : Sciences, les volcans)</mark>
 Mes élèves : <mark>(niveau ou âge, ex. : 5e primaire)</mark>
 Le contenu de mon cours : <mark>(colle ici ton cours, tes notes, ou décris ce que les élèves doivent savoir)</mark>
+Mes propres idées à intégrer telles quelles, en les mettant au bon format : <mark>(facultatif : tes questions, tes vrai ou faux, tes défis, tes idées de mimes… ou efface cette ligne)</mark>
 
 Crée :
 - 20 questions de quiz, avec 3 ou 4 réponses dont une seule bonne. Place la bonne réponse à des positions différentes. Ajoute une courte explication E:.
@@ -139,6 +140,23 @@ Dans [RÉGLAGES], remplis « Cours », « Sous-titre » et « Étoile » (un tit
 Utilise un vocabulaire adapté à l'âge de mes élèves et vérifie que chaque réponse est juste.
 Réponds uniquement avec le contenu du fichier .txt, dans un seul bloc à copier, sans texte avant ni après.</pre>
     <p class="notice">Bon à savoir : ne mets jamais de nom d'élève ni d'information personnelle dans ce que tu envoies à une IA.</p>
+  </section>
+
+  <section class="panel stack">
+    <h2>Adapte-le à ta façon</h2>
+    <div class="grid2">
+      <div class="paper stack" style="align-content:start">
+        <h3>✏️ Ajoute tes propres idées</h3>
+        <p>Tu as déjà des questions en tête, des vrai ou faux tirés de ton cours, des idées de défis ou de mimes ? Écris-les simplement dans la ligne « Mes propres idées », sans te soucier du format, même en vrac. L'IA les met en forme, les garde telles quelles et complète avec les siennes.</p>
+        <p class="small muted">Exemple : « mimes : pétrir la pâte, enfourner, façonner une baguette. Vrai ou faux : la levure est un champignon (vrai). »</p>
+      </div>
+      <div class="paper stack" style="align-content:start">
+        <h3>➕ Demande-en plus</h3>
+        <p>Plus il y a de questions, moins les élèves retombent sur les mêmes. Change les nombres dans le prompt, ou, quand l'IA a répondu, demande-lui la suite :</p>
+        <p class="prompt small" style="white-space:pre-wrap">Ajoute 20 questions de quiz, 10 vrai ou faux, 5 défis et 10 mimes, différents des précédents, dans le même format.</p>
+        <p class="small muted">Copie ensuite les nouvelles questions sous les bonnes sections de ton fichier : [QUIZ], [VRAI-FAUX], [ACTIONS] ou [MIMES].</p>
+      </div>
+    </div>
   </section>
 
   <section class="panel btn-row" style="justify-content:space-between;align-items:center">

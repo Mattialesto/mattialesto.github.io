@@ -179,3 +179,32 @@ textarea.in{resize:vertical;line-height:1.35}
 
 /* ---------- toast ---------- */
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:200;background:var(--ink);color:var(--paper);font-weight:700;border-radius:14px;padding:10px 18px;box-shadow:0 6px 18px rgba(0,0,0,.25);max-width:calc(100vw - 32px)}
+
+/* ---------- astuce IA : illustrations ---------- */
+.chip.pin{background:#fff1b8}
+.topic.pinned{background:#fff1b8;border-style:solid;box-shadow:0 4px 0 var(--ink)}
+.topic.pinned:hover{background:#ffe98a}
+.prompt{white-space:pre-wrap;overflow-wrap:anywhere;font:600 .95rem/1.55 ui-monospace,Consolas,monospace;background:var(--paper);border:3px solid var(--ink);border-radius:14px;padding:14px 16px;margin:0;max-height:none}
+.prompt mark{background:#ffe066;border-radius:4px;padding:0 3px}
+.mk-file{position:relative;width:150px;margin:auto;aspect-ratio:3/4;background:#fff;border:3px solid var(--ink);border-radius:10px 34px 10px 10px;display:grid;place-items:center;align-content:center;gap:8px;box-shadow:0 5px 0 var(--ink)}
+.mk-file b{font-family:var(--f-display);font-size:1.6rem;color:#fff;background:var(--go);border:3px solid var(--ink);border-radius:10px;padding:2px 12px}
+.mk-file span{font-size:.72rem;font-weight:800;text-align:center;padding:0 6px;overflow-wrap:anywhere}
+.mk-chat,.mk-note{background:#fff;border:3px solid var(--ink);border-radius:14px;overflow:hidden;box-shadow:0 5px 0 var(--ink);font-size:.78rem}
+.mk-bar{display:flex;align-items:center;gap:5px;background:var(--ink);color:var(--crumb);padding:5px 8px;font-weight:700;font-size:.72rem}
+.mk-bar i{width:9px;height:9px;border-radius:50%;background:#ff6159}.mk-bar i+i{background:#ffbd2e}.mk-bar i+i+i{background:#28c840}
+.mk-bar span{margin-left:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mk-body{padding:10px;display:grid;gap:8px;background:#f7f4ee}
+.mk-att{justify-self:end;background:#e3f2ff;border:2px solid var(--ink);border-radius:8px;padding:3px 8px;font-weight:700}
+.mk-bub{border:2px solid var(--ink);border-radius:12px;padding:7px 9px;font-weight:600;line-height:1.35}
+.mk-bub.me{justify-self:end;background:#dff7df;max-width:90%;border-bottom-right-radius:3px}
+.mk-bub.ai{background:#fff;position:relative;padding-bottom:26px}
+.mk-bub code{font:600 .74rem/1.4 ui-monospace,Consolas,monospace}
+.mk-copy{position:absolute;right:6px;bottom:5px;background:var(--q);color:#fff;border:2px solid var(--ink);border-radius:6px;padding:0 6px;font-weight:800;font-size:.7rem}
+.mk-input{display:flex;gap:6px;align-items:center;border-top:2px solid var(--ink);padding:6px 8px}
+.mk-input em{flex:1;color:var(--muted)}.mk-input b{color:var(--go)}
+.mk-txt{padding:8px 10px;font:600 .74rem/1.45 ui-monospace,Consolas,monospace;min-height:96px}
+.mk-save{display:flex;gap:6px;align-items:center;border-top:2px solid var(--ink);padding:6px 8px;background:#f7f4ee}
+.mk-save span{margin-left:auto;background:var(--q);color:#fff;border:2px solid var(--ink);border-radius:6px;padding:1px 8px;font-weight:800}
+.mk-check{background:#fff;border:3px solid var(--ink);border-radius:14px;padding:10px 12px;display:grid;gap:6px;font-weight:700;font-size:.85rem;box-shadow:0 5px 0 var(--ink)}
+.mk-check .ok{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:6px;background:var(--go);color:#fff;border:2px solid var(--ink);margin-right:6px;font-size:.75rem}
+.mk-import{background:#fff1b8;border:3px dashed var(--ink-2);border-radius:14px;padding:12px;font-weight:600;font-size:.9rem;box-shadow:0 5px 0 rgba(58,29,14,.25)}

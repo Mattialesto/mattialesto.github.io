@@ -29,6 +29,9 @@
   let cat = params.get('cat') || '';
 
   const who = p => (p && p.display_name) || 'Un prof';
+  const pinned = () => el('a', {class: 'topic pinned', href: 'astuce-ia.html'},
+    el('b', {}, '📌 Astuce : crée ton fichier de questions en 5 minutes avec une IA'), el('span', {class: 'stat'}, 'Épinglé'),
+    el('span', {class: 'small muted'}, 'Le prompt à copier, étape par étape, avec le modèle .txt · par Manderlier Jérôme'), el('span', {}));
   const intro = el('section', {class: 'panel stack'},
     el('h1', {class: 'outline'}, 'Le forum'),
     el('p', {class: 'lead'}, 'Un espace pour échanger entre profs : idées de cours, astuces pour animer le jeu, questions techniques et suggestions d\'amélioration.'),
@@ -37,6 +40,7 @@
   if (!CP.online){
     zone.replaceChildren(intro, el('section', {class: 'panel stack'},
       el('p', {class: 'notice'}, 'Mode démonstration : le forum ouvrira en même temps que les comptes. Voici à quoi il ressemblera.'),
+      pinned(),
       el('div', {class: 'topic'}, el('b', {}, 'Bienvenue sur le forum de Classe Party !'), el('span', {class: 'stat'}, '1 message'), el('span', {class: 'small muted'}, 'Discussions générales · par Manderlier Jérôme')),
       el('div', {class: 'topic'}, el('b', {}, 'Vos idées de mimes pour les cours de sciences ?'), el('span', {class: 'stat'}, 'exemple'), el('span', {class: 'small muted'}, 'Partage de cours'))));
     return;
@@ -47,7 +51,7 @@
       el('button', {type: 'button', class: 'tab', role: 'tab', 'aria-selected': String(k === cat), onclick: () => { cat = k; history.replaceState(null, '', k ? '?cat=' + k : 'forum.html'); listView(); }}, l)));
     const newBtn = el('button', {type: 'button', class: 'btn go', onclick: newTopic}, '+ Nouveau sujet');
     const list = el('div', {class: 'stack', style: 'gap:10px'}, el('p', {class: 'muted'}, 'Chargement…'));
-    zone.replaceChildren(intro, el('section', {class: 'panel stack'}, el('div', {class: 'btn-row', style: 'justify-content:space-between'}, tabs, newBtn), list));
+    zone.replaceChildren(intro, el('section', {class: 'panel stack'}, el('div', {class: 'btn-row', style: 'justify-content:space-between'}, tabs, newBtn), pinned(), list));
     let req = CP.sb.from('forum_topics').select('id,titre,categorie,nb_messages,last_post_at,created_at,profiles!author(display_name)').order('last_post_at', {ascending: false}).limit(100);
     if (cat) req = req.eq('categorie', cat);
     const {data, error} = await req;

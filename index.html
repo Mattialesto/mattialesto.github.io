@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Classe Party · Le jeu de plateau de la classe</title>
+<meta name="description" content="Classe Party est un jeu de plateau gratuit à projeter en classe : quiz, vrai ou faux, mimes et défis sur n'importe quel cours, avec une bibliothèque de cours partagés entre enseignants.">
+<link rel="icon" type="image/png" href="img/favicon.png">
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header id="site-head"></header>
+<main class="wrap" id="main">
+<div class="stack" style="gap:26px">
+  <section class="panel hero">
+    <div class="stack">
+      <h1 class="outline" style="font-size:clamp(2.6rem,7vw,4.6rem)">Classe Party</h1>
+      <p class="lead" style="font-size:clamp(1.15rem,2.4vw,1.45rem)">Le jeu de plateau à projeter en classe pour réviser n'importe quel cours en s'amusant : quiz, vrai ou faux, mimes, défis, pièces et boutique.</p>
+      <p>Gratuit, sans installation, de 2 à 30 joueurs. Tu choisis les questions, la classe fait la fête.</p>
+      <div class="btn-row">
+        <a class="btn go big" href="jouer.html">Jouer maintenant</a>
+        <a class="btn blue big" href="bibliotheque.html">Trouver un cours</a>
+      </div>
+    </div>
+    <div class="hero-art"><img src="img/logo-256.png" alt="Logo de Classe Party : un dé et un pion" width="256" height="256"></div>
+  </section>
+
+  <section class="stack">
+    <h2 class="outline">Ce que tu peux faire</h2>
+    <div class="grid3">
+      <article class="card feature"><div class="ico" style="background:var(--q)">?</div><h3>Toutes les matières</h3><p>Écris tes propres questions ou charge un cours tout prêt : maths, français, sciences, cours techniques…</p></article>
+      <article class="card feature"><div class="ico" style="background:var(--m)">☺</div><h3>Toute la classe joue</h3><p>Quiz, vrai ou faux, défis et mimes : chaque case relance l'attention, même pour les élèves les plus discrets.</p></article>
+      <article class="card feature"><div class="ico" style="background:var(--c)">★</div><h3>Un vrai jeu</h3><p>Dés animés, pièces, boutique, coup de feu final et étoiles bonus : l'ambiance d'un jeu vidéo, au service du cours.</p></article>
+      <article class="card feature"><div class="ico" style="background:var(--go)">✓</div><h3>Un bilan après chaque partie</h3><p>Les questions ratées, les réponses données et la réussite de chaque élève, à télécharger en Word.</p></article>
+      <article class="card feature"><div class="ico" style="background:var(--v)">♥</div><h3>Une communauté de profs</h3><p>Partage tes cours dans la bibliothèque, profite de ceux des autres et échange sur le forum.</p></article>
+      <article class="card feature"><div class="ico" style="background:var(--a)">⌂</div><h3>Pensé pour l'école</h3><p>Fonctionne sans internet une fois chargé, sans compte pour jouer, et sans jamais stocker de données d'élèves.</p></article>
+    </div>
+  </section>
+
+  <section class="panel grid2">
+    <div class="stack">
+      <h2>Comment ça marche ?</h2>
+      <ol class="steps">
+        <li><div><b>Choisis un cours.</b> Dans la bibliothèque, ou écris tes questions dans le mode prof.</div></li>
+        <li><div><b>Projette le jeu.</b> Entre les prénoms ou les équipes, puis lance la partie.</div></li>
+        <li><div><b>Joue et récolte le bilan.</b> À la fin, le jeu te dit ce qui est acquis et ce qu'il faut revoir.</div></li>
+      </ol>
+      <div class="btn-row"><a class="btn violet" href="tuto.html">Voir le tuto complet</a></div>
+    </div>
+    <div class="stack">
+      <h2>Rejoins la communauté</h2>
+      <p>Avec un compte gratuit, tes cours sont sauvegardés en ligne et tu les retrouves sur tous tes ordinateurs. Tu peux aussi les partager avec les autres profs et participer au forum.</p>
+      <div class="btn-row"><a class="btn go" href="connexion.html?mode=signup">Créer mon compte</a><a class="btn grey" href="deontologie.html">Lire la charte</a></div>
+    </div>
+  </section>
+
+  <section class="stack" id="latest" hidden>
+    <h2 class="outline">Derniers cours partagés</h2>
+    <div class="grid3" id="latestList"></div>
+  </section>
+</div>
+</main>
+<footer id="site-foot"></footer>
+<script src="lib/supabase.js"></script>
+<script src="config.js"></script>
+<script src="format.js"></script>
+<script src="exemples.js"></script>
+<script src="app.js"></script>
+<script>
+(async () => {
+  await CP.init('index.html');
+  if (!CP.online) return;
+  const {el, $} = CP;
+  const {data} = await CP.sb.from('courses').select('id,titre,matiere,niveau,nb_questions,profiles(display_name)').eq('public', true).order('created_at', {ascending: false}).limit(6);
+  if (!data || !data.length) return;
+  $('#latest').hidden = false;
+  $('#latestList').replaceChildren(...data.map(c => el('a', {class: 'card', href: 'bibliotheque.html?matiere=' + encodeURIComponent(c.matiere), style: 'text-decoration:none;color:inherit'},
+    el('h3', {}, c.titre), el('div', {class: 'meta'}, el('span', {class: 'chip m'}, c.matiere), el('span', {class: 'chip n'}, c.niveau)),
+    el('p', {class: 'stat'}, `${c.nb_questions} questions · par ${(c.profiles && c.profiles.display_name) || 'un prof'}`))));
+})();
+
+</script>
+</body>
+</html>

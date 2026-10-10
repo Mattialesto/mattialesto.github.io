@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bibliothèque de cours · Classe Party</title>
+<meta name="description" content="Les cours Classe Party partagés par les enseignants : trouve un cours, joue-le en classe ou télécharge-le.">
+<link rel="icon" type="image/png" href="img/favicon.png">
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header id="site-head"></header>
+<main class="wrap" id="main">
+<div class="stack">
+  <section class="panel stack">
+    <h1 class="outline">La bibliothèque</h1>
+    <p class="lead">Des cours prêts à jouer, partagés par d'autres profs. Un clic sur « Jouer » et le plateau se charge avec leurs questions.</p>
+    <form class="toolbar" id="filters" role="search">
+      <label class="field"><span>Rechercher</span><input class="in" id="q" type="search" placeholder="Ex. : angles, fractions, hygiène…"></label>
+      <label class="field"><span>Matière</span><select class="in" id="fm"><option value="">Toutes</option></select></label>
+      <label class="field"><span>Niveau</span><select class="in" id="fn"><option value="">Tous</option></select></label>
+      <label class="field"><span>Trier par</span><select class="in" id="fs"><option value="recent">Les plus récents</option><option value="likes">Les plus aimés</option><option value="titre">Ordre alphabétique</option></select></label>
+    </form>
+    <p class="muted small" id="count" role="status"></p>
+  </section>
+  <div class="grid3" id="list"></div>
+  <section class="panel btn-row" style="justify-content:space-between">
+    <p class="lead" style="flex:1;min-width:240px">Toi aussi, partage tes cours avec la communauté !</p>
+    <a class="btn go" href="mes-cours.html">Partager un cours</a>
+  </section>
+</div>
+</main>
+<footer id="site-foot"></footer>
+<script src="lib/supabase.js"></script>
+<script src="config.js"></script>
+<script src="format.js"></script>
+<script src="exemples.js"></script>
+<script src="app.js"></script>
+<script>
+(async () => {
+  await CP.init('bibliotheque.html');
+  const {el, $} = CP;
+  CP.MATIERES.forEach(m => $('#fm').append(el('option', {value: m}, m)));
+  CP.NIVEAUX.forEach(n => $('#fn').append(el('option', {value: n}, n)));
+  const params = new URLSearchParams(location.search);
+  if (params.get('matiere')) $('#fm').value = params.get('matiere');
+  let myLikes = new Set();
+
+  async function getContent(c){
+    if (c.contenu) return c;
+    const {data, error} = await CP.sb.from('courses').select('contenu').eq('id', c.id).single();
+    if (error){ CP.toast('Impossible de charger ce cours.'); return null; }
+    c.contenu = data.contenu; return c;
+  }
+  function card(c){
+    const likeBtn = el('button', {type: 'button', class: 'btn small ' + (myLikes.has(c.id) ? 'pink' : 'grey'), 'aria-pressed': String(myLikes.has(c.id)), title: 'J\'aime'}, `♥ ${c.likes || 0}`);
+    likeBtn.addEventListener('click', async () => {
+      if (!CP.online){ CP.toast('Les « j\'aime » seront actifs quand les comptes seront ouverts.'); return; }
+      if (!CP.user){ CP.toast('Connecte-toi pour aimer un cours.'); return; }
+      const liked = myLikes.has(c.id);
+      const {error} = liked ? await CP.sb.from('course_likes').delete().eq('course_id', c.id).eq('user_id', CP.user.id)
+                            : await CP.sb.from('course_likes').insert({course_id: c.id});
+      if (error){ CP.toast('Action impossible pour le moment.'); return; }
+      liked ? myLikes.delete(c.id) : myLikes.add(c.id); c.likes = (c.likes || 0) + (liked ? -1 : 1);
+      likeBtn.textContent = `♥ ${c.likes}`; likeBtn.className = 'btn small ' + (liked ? 'grey' : 'pink'); likeBtn.setAttribute('aria-pressed', String(!liked));
+    });
+    const author = c.auteur || (c.profiles && c.profiles.display_name) || 'Un prof';
+    return el('article', {class: 'card'},
+      el('h3', {}, c.titre),
+      el('div', {class: 'meta'}, el('span', {class: 'chip m'}, c.matiere), el('span', {class: 'chip n'}, c.niveau), c.exemple ? el('span', {class: 'chip'}, 'Exemple') : null),
+      c.description ? el('p', {class: 'small'}, c.description) : null,
+      el('p', {class: 'stat'}, `${c.nb_questions} questions · par ${author}` + (c.created_at ? ' · ' + CP.ago(c.created_at) : '')),
+      el('div', {class: 'foot'},
+        el('button', {type: 'button', class: 'btn small go', onclick: async () => { const x = await getContent(c); if (x) CP.play(x.contenu, x.titre); }}, 'Jouer'),
+        el('button', {type: 'button', class: 'btn small blue', onclick: async () => { const x = await getContent(c); if (x) CP.preview(x); }}, 'Aperçu'),
+        el('button', {type: 'button', class: 'btn small violet', onclick: async () => { const x = await getContent(c); if (x) CP.download('Questions-' + CP.slug(x.titre) + '.txt', x.contenu); }}, '.txt'),
+        likeBtn,
+        CP.online && !c.exemple ? el('button', {type: 'button', class: 'linklike small', onclick: () => CP.report('cours', c.id)}, 'Signaler') : null));
+  }
+  function examples(){
+    return (window.CP_EXEMPLES || []).map(e => Object.assign({exemple: true, likes: 0, nb_questions: CP.parse(e.contenu).total}, e));
+  }
+  async function load(){
+    const list = $('#list'); list.replaceChildren(el('p', {class: 'muted'}, 'Chargement…'));
+    const q = $('#q').value.trim().replace(/[,()%*\\]/g, ' ').slice(0, 60), fm = $('#fm').value, fn = $('#fn').value, fs = $('#fs').value;
+    let rows;
+    if (!CP.online){
+      rows = examples().filter(c => (!fm || c.matiere === fm) && (!fn || c.niveau === fn) && (!q || (c.titre + ' ' + c.description).toLowerCase().includes(q.toLowerCase())));
+    } else {
+      let req = CP.sb.from('courses').select('id,titre,matiere,niveau,description,nb_questions,likes,created_at,owner,profiles(display_name)').eq('public', true);
+      if (fm) req = req.eq('matiere', fm);
+      if (fn) req = req.eq('niveau', fn);
+      if (q) req = req.or(`titre.ilike.%${q}%,description.ilike.%${q}%`);
+      req = fs === 'likes' ? req.order('likes', {ascending: false}).order('created_at', {ascending: false}) : fs === 'titre' ? req.order('titre') : req.order('created_at', {ascending: false});
+      const {data, error} = await req.limit(90);
+      if (error){ list.replaceChildren(el('p', {class: 'notice err'}, 'La bibliothèque n\'a pas pu être chargée. Réessaie dans un instant.')); return; }
+      rows = data;
+      if (CP.user && rows.length){
+        const {data: likes} = await CP.sb.from('course_likes').select('course_id').eq('user_id', CP.user.id);
+        myLikes = new Set((likes || []).map(l => l.course_id));
+      }
+    }
+    $('#count').textContent = CP.online ? `${rows.length} cours trouvé(s)` : `Mode démonstration : ${rows.length} cours d'exemple. Les cours des autres profs apparaîtront ici quand les comptes seront ouverts.`;
+    if (!rows.length){ list.replaceChildren(el('div', {class: 'panel empty', style: 'grid-column:1/-1'}, el('h2', {}, 'Aucun cours trouvé'), el('p', {}, 'Essaie une autre recherche, ou sois le premier à partager un cours sur ce sujet !'))); return; }
+    list.replaceChildren(...rows.map(card));
+  }
+  let t; $('#q').addEventListener('input', () => { clearTimeout(t); t = setTimeout(load, 350); });
+  ['#fm', '#fn', '#fs'].forEach(s => $(s).addEventListener('change', load));
+  $('#filters').addEventListener('submit', e => { e.preventDefault(); load(); });
+  CP.onAuthChange = load;
+  load();
+})();
+
+</script>
+</body>
+</html>

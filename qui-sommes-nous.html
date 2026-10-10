@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Qui sommes-nous · Classe Party</title>
+<meta name="description" content="L'histoire de Classe Party et la présentation de son créateur, Jérôme Manderlier, enseignant.">
+<link rel="icon" type="image/png" href="img/favicon.png">
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header id="site-head"></header>
+<main class="wrap" id="main">
+<div class="stack" style="gap:24px">
+  <section class="panel grid2" style="align-items:center">
+    <div class="stack">
+      <h1 class="outline">Qui sommes-nous ?</h1>
+      <p class="lead">Classe Party, c'est d'abord un prof qui voulait que ses élèves aient envie de réviser.</p>
+    </div>
+    <div style="display:grid;place-items:center">
+      <div class="paper" style="width:min(260px,100%);aspect-ratio:1;display:grid;place-items:center;text-align:center;border-style:dashed">
+        <span class="todo">[Ta photo ici]<br><small>Remplace ce cadre par img/photo.jpg</small></span>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="prose">
+      <h2>Jérôme Manderlier</h2>
+      <p>Je suis enseignant en <b>boulangerie-pâtisserie</b> dans l'<b>enseignement secondaire spécialisé</b> (forme 3), en Fédération Wallonie-Bruxelles, <span class="todo">[à l'école …, à …, depuis … ans]</span>.</p>
+      <p>Mes élèves apprennent un métier avec leurs mains. Pour beaucoup d'entre eux, l'école a souvent rimé avec difficulté. Mon défi de tous les jours : leur donner confiance, et leur faire retenir la théorie sans passer par de longues pages à lire.</p>
+      <p class="todo">[Ajoute ici quelques lignes plus personnelles : ton parcours, ce que tu aimes dans ton métier, une anecdote de classe…]</p>
+
+      <h2>L'histoire du jeu</h2>
+      <p>Tout a commencé par un simple Kahoot sur le matériel de la boulangerie. Les élèves ont adoré, mais tout le monde regardait son écran, et l'ambiance retombait vite. J'ai voulu quelque chose de plus vivant : un vrai plateau projeté au tableau, des dés, des mimes, des défis, des retournements de situation… et un peu de suspense jusqu'à la dernière seconde.</p>
+      <p>Le jeu s'est appelé d'abord « Le Grand Tour du Mitron ». Très vite, je me suis dit qu'il pouvait servir à tous les cours et à tous les âges : il est devenu <b>Classe Party</b>.</p>
+
+      <h2>Ce que je veux faire avec Classe Party</h2>
+      <ul>
+        <li>Offrir aux enseignants un outil <b>gratuit, simple et joyeux</b>, qui marche même dans une classe sans bon réseau.</li>
+        <li>Créer une <b>communauté de profs</b> qui partagent leurs cours au lieu de tout refaire chacun dans son coin.</li>
+        <li>Rester fidèle à l'esprit de l'école : <b>bienveillance, neutralité et respect des élèves</b> (voir la <a href="deontologie.html">charte de déontologie</a>).</li>
+      </ul>
+
+      <h2>Me contacter</h2>
+      <p>Une idée, une remarque, une envie de participer ? Le plus simple est de poster sur le <a href="forum.html">forum</a>. Tu peux aussi m'écrire : <span id="contact" class="todo">[adresse mail de contact à compléter dans config.js]</span>.</p>
+    </div>
+  </section>
+</div>
+</main>
+<footer id="site-foot"></footer>
+<script src="lib/supabase.js"></script>
+<script src="config.js"></script>
+<script src="format.js"></script>
+<script src="exemples.js"></script>
+<script src="app.js"></script>
+<script>
+CP.init('qui-sommes-nous.html').then(() => {
+  const c = (window.CP_CONFIG || {}).CONTACT_EMAIL;
+  if (c){ const s = document.getElementById('contact'); s.textContent = c; s.className = ''; }
+});
+
+</script>
+</body>
+</html>

@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Connexion · Classe Party</title>
+<meta name="description" content="Connecte-toi ou crée ton compte gratuit de professeur sur Classe Party.">
+<link rel="icon" type="image/png" href="img/favicon.png">
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header id="site-head"></header>
+<main class="wrap" id="main">
+<section class="panel" style="max-width:560px;margin-inline:auto">
+  <div class="stack">
+    <h1 class="outline">Mon compte</h1>
+    <p class="lead">Le compte est gratuit et réservé aux enseignants. Il sert à sauvegarder tes cours en ligne, à les partager et à participer au forum.</p>
+    <div class="tabs" role="tablist">
+      <button type="button" class="tab" role="tab" data-tab="login" aria-selected="true">Connexion</button>
+      <button type="button" class="tab" role="tab" data-tab="signup" aria-selected="false">Créer un compte</button>
+      <button type="button" class="tab" role="tab" data-tab="forgot" aria-selected="false">Mot de passe oublié</button>
+    </div>
+    <p class="notice" id="demoNote" hidden>Les comptes ne sont pas encore activés sur ce site (mode démonstration). Tu peux déjà <a href="jouer.html">jouer</a> et lire le <a href="tuto.html">tuto</a>.</p>
+
+    <form class="form" id="f-login" data-pane="login">
+      <label class="field"><span>Adresse mail</span><input class="in" id="l-mail" type="email" autocomplete="email" required></label>
+      <label class="field"><span>Mot de passe</span><input class="in" id="l-pass" type="password" autocomplete="current-password" required></label>
+      <button class="btn go big" type="submit">Se connecter</button>
+      <p class="msg" id="l-msg" role="status"></p>
+    </form>
+
+    <form class="form" id="f-signup" data-pane="signup" hidden>
+      <label class="field"><span>Nom affiché (visible par les autres profs)</span><input class="in" id="s-name" type="text" maxlength="40" minlength="2" autocomplete="nickname" placeholder="Ex. : Madame Dupont" required></label>
+      <label class="field"><span>Adresse mail</span><input class="in" id="s-mail" type="email" autocomplete="email" required></label>
+      <label class="field"><span>Mot de passe (8 caractères minimum)</span><input class="in" id="s-pass" type="password" minlength="8" autocomplete="new-password" required></label>
+      <label class="check"><input type="checkbox" id="s-charte" required> <span>J'ai lu et j'accepte la <a href="deontologie.html" target="_blank">charte de déontologie</a> et la <a href="confidentialite.html" target="_blank">politique de confidentialité</a>.</span></label>
+      <button class="btn go big" type="submit">Créer mon compte</button>
+      <p class="msg" id="s-msg" role="status"></p>
+    </form>
+
+    <form class="form" id="f-forgot" data-pane="forgot" hidden>
+      <p>Indique ton adresse mail : tu recevras un lien pour choisir un nouveau mot de passe.</p>
+      <label class="field"><span>Adresse mail</span><input class="in" id="r-mail" type="email" autocomplete="email" required></label>
+      <button class="btn blue big" type="submit">Recevoir le lien</button>
+      <p class="msg" id="r-msg" role="status"></p>
+    </form>
+
+    <form class="form" id="f-newpass" data-pane="newpass" hidden>
+      <p class="lead">Choisis ton nouveau mot de passe.</p>
+      <label class="field"><span>Nouveau mot de passe (8 caractères minimum)</span><input class="in" id="n-pass" type="password" minlength="8" autocomplete="new-password" required></label>
+      <button class="btn go big" type="submit">Enregistrer</button>
+      <p class="msg" id="n-msg" role="status"></p>
+    </form>
+  </div>
+</section>
+</main>
+<footer id="site-foot"></footer>
+<script src="lib/supabase.js"></script>
+<script src="config.js"></script>
+<script src="format.js"></script>
+<script src="exemples.js"></script>
+<script src="app.js"></script>
+<script>
+(async () => {
+  await CP.init('connexion.html');
+  const $ = CP.$;
+  const params = new URLSearchParams(location.search);
+  const retour = params.get('retour') && /^[a-z0-9-]+\.html(\?[^#]*)?$/i.test(params.get('retour')) ? params.get('retour') : 'mes-cours.html';
+  const show = name => {
+    document.querySelectorAll('[data-pane]').forEach(f => { f.hidden = f.dataset.pane !== name; });
+    document.querySelectorAll('.tab').forEach(t => t.setAttribute('aria-selected', String(t.dataset.tab === name)));
+  };
+  document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => show(t.dataset.tab)));
+  if (params.get('mode') === 'signup') show('signup');
+  const say = (id, text, ok) => { const m = $(id); m.textContent = text; m.className = 'msg ' + (ok ? 'ok' : 'err'); };
+  const busy = (form, on) => form.querySelectorAll('button').forEach(b => { b.disabled = on; });
+
+  if (!CP.online){
+    $('#demoNote').hidden = false;
+    document.querySelectorAll('form').forEach(f => f.querySelectorAll('input,button').forEach(i => { i.disabled = true; }));
+    return;
+  }
+  if (CP.user && !location.hash.includes('type=recovery')){ location.href = retour; return; }
+  CP.sb.auth.onAuthStateChange(ev => { if (ev === 'PASSWORD_RECOVERY') show('newpass'); });
+  if (location.hash.includes('type=recovery')) show('newpass');
+  const here = location.href.split('#')[0].split('?')[0];
+
+  $('#f-login').addEventListener('submit', async e => {
+    e.preventDefault(); busy(e.target, true);
+    const {error} = await CP.sb.auth.signInWithPassword({email: $('#l-mail').value.trim(), password: $('#l-pass').value});
+    busy(e.target, false);
+    if (error){ say('#l-msg', /confirm/i.test(error.message) ? 'Ton adresse n\'est pas encore confirmée : clique sur le lien reçu par mail.' : 'Adresse ou mot de passe incorrect.'); return; }
+    location.href = retour;
+  });
+  $('#f-signup').addEventListener('submit', async e => {
+    e.preventDefault();
+    if (!$('#s-charte').checked){ say('#s-msg', 'Merci d\'accepter la charte de déontologie.'); return; }
+    busy(e.target, true);
+    const {data, error} = await CP.sb.auth.signUp({email: $('#s-mail').value.trim(), password: $('#s-pass').value,
+      options: {data: {display_name: $('#s-name').value.trim()}, emailRedirectTo: here.replace(/connexion\.html$/, 'mes-cours.html')}});
+    busy(e.target, false);
+    if (error){ say('#s-msg', /registered|exists/i.test(error.message) ? 'Un compte existe déjà avec cette adresse. Connecte-toi.' : /password/i.test(error.message) ? 'Mot de passe trop faible : 8 caractères minimum.' : 'L\'inscription n\'a pas pu se faire : ' + error.message); return; }
+    if (data.session){ location.href = 'mes-cours.html'; return; }
+    say('#s-msg', 'Compte créé ! Ouvre le mail que tu viens de recevoir et clique sur le lien pour confirmer ton adresse.', true);
+    e.target.reset();
+  });
+  $('#f-forgot').addEventListener('submit', async e => {
+    e.preventDefault(); busy(e.target, true);
+    const {error} = await CP.sb.auth.resetPasswordForEmail($('#r-mail').value.trim(), {redirectTo: here});
+    busy(e.target, false);
+    if (error){ say('#r-msg', 'L\'envoi n\'a pas marché. Réessaie dans quelques minutes.'); return; }
+    say('#r-msg', 'C\'est envoyé ! Regarde ta boîte mail (et les indésirables).', true);
+  });
+  $('#f-newpass').addEventListener('submit', async e => {
+    e.preventDefault(); busy(e.target, true);
+    const {error} = await CP.sb.auth.updateUser({password: $('#n-pass').value});
+    busy(e.target, false);
+    if (error){ say('#n-msg', 'Le mot de passe n\'a pas pu être changé : ' + error.message); return; }
+    say('#n-msg', 'Mot de passe changé ! Redirection…', true); setTimeout(() => { location.href = 'mes-cours.html'; }, 1200);
+  });
+})();
+
+</script>
+</body>
+</html>

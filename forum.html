@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Forum · Classe Party</title>
+<meta name="description" content="Le forum des enseignants qui utilisent Classe Party : idées de cours, entraide et suggestions.">
+<link rel="icon" type="image/png" href="img/favicon.png">
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header id="site-head"></header>
+<main class="wrap" id="main">
+<div class="stack" id="zone"></div>
+</main>
+<footer id="site-foot"></footer>
+<script src="lib/supabase.js"></script>
+<script src="config.js"></script>
+<script src="format.js"></script>
+<script src="exemples.js"></script>
+<script src="app.js"></script>
+<script>
+(async () => {
+  await CP.init('forum.html');
+  const {el, $} = CP; const zone = $('#zone');
+  const params = new URLSearchParams(location.search);
+  const topicId = params.get('sujet');
+  let cat = params.get('cat') || '';
+
+  const who = p => (p && p.display_name) || 'Un prof';
+  const intro = el('section', {class: 'panel stack'},
+    el('h1', {class: 'outline'}, 'Le forum'),
+    el('p', {class: 'lead'}, 'Un espace pour échanger entre profs : idées de cours, astuces pour animer le jeu, questions techniques et suggestions d\'amélioration.'),
+    el('p', {class: 'small muted'}, 'Avant de poster, relis la ', el('a', {href: 'deontologie.html'}, 'charte de déontologie'), ' : bienveillance, pas de nom d\'élève, pas de publicité.'));
+
+  if (!CP.online){
+    zone.replaceChildren(intro, el('section', {class: 'panel stack'},
+      el('p', {class: 'notice'}, 'Mode démonstration : le forum ouvrira en même temps que les comptes. Voici à quoi il ressemblera.'),
+      el('div', {class: 'topic'}, el('b', {}, 'Bienvenue sur le forum de Classe Party !'), el('span', {class: 'stat'}, '1 message'), el('span', {class: 'small muted'}, 'Discussions générales · par Manderlier Jérôme')),
+      el('div', {class: 'topic'}, el('b', {}, 'Vos idées de mimes pour les cours de sciences ?'), el('span', {class: 'stat'}, 'exemple'), el('span', {class: 'small muted'}, 'Partage de cours'))));
+    return;
+  }
+
+  async function listView(){
+    const tabs = el('div', {class: 'tabs', role: 'tablist'}, [['', 'Tous les sujets'], ...Object.entries(CP.FORUM_CATS)].map(([k, l]) =>
+      el('button', {type: 'button', class: 'tab', role: 'tab', 'aria-selected': String(k === cat), onclick: () => { cat = k; history.replaceState(null, '', k ? '?cat=' + k : 'forum.html'); listView(); }}, l)));
+    const newBtn = el('button', {type: 'button', class: 'btn go', onclick: newTopic}, '+ Nouveau sujet');
+    const list = el('div', {class: 'stack', style: 'gap:10px'}, el('p', {class: 'muted'}, 'Chargement…'));
+    zone.replaceChildren(intro, el('section', {class: 'panel stack'}, el('div', {class: 'btn-row', style: 'justify-content:space-between'}, tabs, newBtn), list));
+    let req = CP.sb.from('forum_topics').select('id,titre,categorie,nb_messages,last_post_at,created_at,profiles(display_name)').order('last_post_at', {ascending: false}).limit(100);
+    if (cat) req = req.eq('categorie', cat);
+    const {data, error} = await req;
+    if (error){ list.replaceChildren(el('p', {class: 'notice err'}, 'Le forum n\'a pas pu être chargé.')); return; }
+    if (!data.length){ list.replaceChildren(el('div', {class: 'empty'}, el('p', {class: 'lead'}, 'Aucun sujet pour l\'instant. Lance la discussion !'))); return; }
+    list.replaceChildren(...data.map(t => el('a', {class: 'topic', href: 'forum.html?sujet=' + t.id},
+      el('b', {}, t.titre), el('span', {class: 'stat'}, `${t.nb_messages} message${t.nb_messages > 1 ? 's' : ''}`),
+      el('span', {class: 'small muted'}, `${CP.FORUM_CATS[t.categorie] || ''} · par ${who(t.profiles)}`), el('span', {class: 'small muted', style: 'text-align:right'}, CP.ago(t.last_post_at)))));
+  }
+  function newTopic(){
+    if (!CP.user){ CP.needLogin(zone, 'participer au forum'); return; }
+    const sel = el('select', {class: 'in'}, Object.entries(CP.FORUM_CATS).map(([k, l]) => el('option', {value: k, selected: k === cat ? true : null}, l)));
+    const titre = el('input', {class: 'in', maxlength: '120', placeholder: 'Le titre de ton sujet'});
+    const txt = el('textarea', {class: 'in', rows: '6', maxlength: '5000', placeholder: 'Ton message…'});
+    const msg = el('p', {class: 'msg', role: 'status'});
+    const close = CP.modal({title: 'Nouveau sujet', body: [el('label', {class: 'field'}, el('span', {}, 'Catégorie'), sel), el('label', {class: 'field'}, el('span', {}, 'Titre'), titre), el('label', {class: 'field'}, el('span', {}, 'Message'), txt), msg],
+      foot: [el('button', {type: 'button', class: 'btn go', onclick: async e => {
+        if (titre.value.trim().length < 3 || !txt.value.trim()){ msg.className = 'msg err'; msg.textContent = 'Écris un titre (3 caractères minimum) et un message.'; return; }
+        e.target.disabled = true;
+        const {data, error} = await CP.sb.from('forum_topics').insert({categorie: sel.value, titre: titre.value.trim()}).select('id').single();
+        if (error){ e.target.disabled = false; msg.className = 'msg err'; msg.textContent = 'Publication impossible : ' + error.message; return; }
+        await CP.sb.from('forum_posts').insert({topic_id: data.id, contenu: txt.value.trim()});
+        close(); location.href = 'forum.html?sujet=' + data.id;
+      }}, 'Publier')]});
+  }
+  async function topicView(){
+    const {data: t, error} = await CP.sb.from('forum_topics').select('id,titre,categorie,author,created_at,profiles(display_name)').eq('id', topicId).maybeSingle();
+    if (error || !t){ zone.replaceChildren(el('div', {class: 'panel empty'}, el('h2', {}, 'Sujet introuvable'), el('a', {class: 'btn blue', href: 'forum.html'}, 'Retour au forum'))); return; }
+    const posts = el('div', {class: 'stack', style: 'gap:10px'});
+    const reply = el('textarea', {class: 'in', rows: '4', maxlength: '5000', placeholder: 'Ta réponse…'});
+    const msg = el('p', {class: 'msg', role: 'status'});
+    const replyBox = CP.user ? el('div', {class: 'stack', style: 'gap:8px'}, el('label', {class: 'field'}, el('span', {}, 'Répondre'), reply),
+      el('div', {class: 'btn-row'}, el('button', {type: 'button', class: 'btn go', onclick: async e => {
+        if (!reply.value.trim()){ msg.className = 'msg err'; msg.textContent = 'Le message est vide.'; return; }
+        e.target.disabled = true;
+        const {error: er} = await CP.sb.from('forum_posts').insert({topic_id: t.id, contenu: reply.value.trim()});
+        e.target.disabled = false;
+        if (er){ msg.className = 'msg err'; msg.textContent = 'Envoi impossible : ' + er.message; return; }
+        reply.value = ''; msg.textContent = ''; loadPosts();
+      }}, 'Envoyer')), msg)
+      : el('p', {class: 'notice'}, el('a', {href: 'connexion.html?retour=' + encodeURIComponent('forum.html?sujet=' + t.id)}, 'Connecte-toi'), ' pour répondre.');
+    const canDelTopic = CP.user && (CP.user.id === t.author || CP.isAdmin());
+    zone.replaceChildren(el('section', {class: 'panel stack'},
+      el('a', {href: 'forum.html', class: 'small'}, '← Tous les sujets'),
+      el('h1', {style: 'font-size:clamp(1.6rem,4vw,2.4rem)'}, t.titre),
+      el('p', {class: 'muted small'}, `${CP.FORUM_CATS[t.categorie] || ''} · ouvert par ${who(t.profiles)} le ${CP.fmtDate(t.created_at)}`),
+      el('div', {class: 'btn-row'},
+        CP.user ? el('button', {type: 'button', class: 'linklike small', onclick: () => CP.report('sujet', t.id)}, 'Signaler ce sujet') : null,
+        canDelTopic ? el('button', {type: 'button', class: 'linklike small', onclick: async e => {
+          if (!e.target.dataset.armed){ e.target.dataset.armed = '1'; e.target.textContent = 'Confirmer la suppression du sujet ?'; return; }
+          const {error: er} = await CP.sb.from('forum_topics').delete().eq('id', t.id);
+          if (er) CP.toast('Suppression impossible.'); else location.href = 'forum.html';
+        }}, 'Supprimer le sujet') : null),
+      posts, replyBox));
+    async function loadPosts(){
+      const {data, error: er} = await CP.sb.from('forum_posts').select('id,contenu,created_at,author,profiles(display_name)').eq('topic_id', t.id).order('created_at');
+      if (er){ posts.replaceChildren(el('p', {class: 'notice err'}, 'Messages indisponibles.')); return; }
+      posts.replaceChildren(...data.map(p => el('article', {class: 'post'},
+        el('div', {class: 'who'}, el('span', {class: 'avatar', 'aria-hidden': 'true'}, CP.initials(who(p.profiles))), who(p.profiles), el('span', {class: 'muted small'}, CP.ago(p.created_at)),
+          CP.user ? el('button', {type: 'button', class: 'linklike small', style: 'margin-left:auto', onclick: () => CP.report('message', p.id)}, 'Signaler') : null,
+          CP.user && (CP.user.id === p.author || CP.isAdmin()) ? el('button', {type: 'button', class: 'linklike small', onclick: async () => {
+            const {error: e2} = await CP.sb.from('forum_posts').delete().eq('id', p.id); if (e2) CP.toast('Suppression impossible.'); else loadPosts(); }}, 'Supprimer') : null),
+        el('div', {class: 'txt'}, p.contenu))));
+    }
+    loadPosts();
+  }
+  CP.onAuthChange = () => location.reload();
+  if (topicId) topicView(); else listView();
+})();
+
+</script>
+</body>
+</html>

@@ -1,0 +1,68 @@
+﻿# =====================================================================
+# MODÈLE DE FICHIER DE QUESTIONS  -  Classe Party v1.1
+# Remplis ce fichier dans le Bloc-notes, enregistre-le sous un nouveau
+# nom (ex. : Questions-Geographie.txt), puis charge-le dans le jeu :
+# Mode prof > Sauvegarde > Charger un fichier de questions
+# =====================================================================
+#
+# Règles :
+#   - Les lignes qui commencent par # sont ignorées (commentaires).
+#   - Laisse une ligne vide entre deux questions.
+#   QUIZ       Q: la question
+#              * la bonne réponse
+#              - une mauvaise réponse   (2 à 4 réponses en tout)
+#              E: explication (facultatif)
+#   VRAI-FAUX  V: une affirmation VRAIE   ou   F: une affirmation FAUSSE
+#              E: explication (facultatif)
+#   ACTIONS    A: le défi
+#              R: la réponse attendue (facultatif)
+#   MIMES      un mime par ligne
+#   CHANCE et MALCHANCE   effet | texte de la carte (facultatif :
+#              sans ces sections, le jeu garde ses cartes habituelles)
+#              effets possibles : +3 pièces, -2 pièces, +2 cases, -3 cases, Rejoue, Prison
+#
+# Remplace les exemples ci-dessous par tes propres questions.
+
+[RÉGLAGES]
+Cours = Géographie 1re
+Titre = Classe Party
+Sous-titre = Géographie : l'Europe
+Étoile = Le Grand Explorateur
+
+[QUIZ]
+
+Q: Quelle est la capitale de l'Italie ?
+- Milan
+* Rome
+- Venise
+- Naples
+E: Rome est la capitale de l'Italie depuis 1871.
+
+Q: Quel est le plus long fleuve de France ?
+* La Loire
+- La Seine
+- Le Rhône
+
+[VRAI-FAUX]
+
+V: La Belgique a trois langues officielles.
+E: Le français, le néerlandais et l'allemand.
+
+F: Paris est traversée par le Rhône.
+E: Paris est traversée par la Seine.
+
+[ACTIONS]
+
+A: Cite 3 pays qui ont une frontière avec la Belgique.
+R: France, Pays-Bas, Allemagne, Luxembourg.
+
+[MIMES]
+Escalader une montagne
+Ramer sur un fleuve
+Lire une carte routière
+
+# [CHANCE]
+# +3 pièces | Tu as trouvé le pays mystère !
+#
+# [MALCHANCE]
+# -2 pièces | Tu as oublié ton atlas.

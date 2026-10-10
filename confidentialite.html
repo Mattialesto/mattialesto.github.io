@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Confidentialité · Classe Party</title>
+<meta name="description" content="Quelles données Classe Party utilise, pourquoi, où elles sont stockées et comment exercer tes droits.">
+<link rel="icon" type="image/png" href="img/favicon.png">
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header id="site-head"></header>
+<main class="wrap" id="main">
+<article class="panel">
+  <div class="prose">
+    <h1 class="outline">Confidentialité</h1>
+    <p class="lead">En résumé : jouer ne demande aucune donnée personnelle. Le compte de prof ne contient que le strict nécessaire. Les données des élèves ne quittent jamais l'ordinateur de la classe.</p>
+    <p class="small muted">Version du 10 octobre 2026. Ce texte respecte le Règlement général sur la protection des données (RGPD).</p>
+
+    <h2>Qui est responsable ?</h2>
+    <p>Le site Classe Party est édité par Jérôme Manderlier, enseignant, à titre personnel. Contact : <span id="contact" class="todo">[adresse mail de contact à compléter dans config.js]</span>.</p>
+
+    <h2>Quand tu joues</h2>
+    <ul>
+      <li>Le jeu fonctionne entièrement dans ton navigateur. <b>Aucun compte n'est nécessaire.</b></li>
+      <li>Les prénoms des élèves, les parties en cours, les questions que tu écris dans le mode prof et les bilans sont enregistrés <b>uniquement dans ton navigateur</b>, sur ton ordinateur. Ils ne sont jamais envoyés sur nos serveurs.</li>
+      <li>Ce stockage local sert seulement au fonctionnement du jeu. Il n'y a ni publicité ni outil de mesure d'audience.</li>
+    </ul>
+
+    <h2>Quand tu crées un compte</h2>
+    <p>Nous enregistrons :</p>
+    <ul>
+      <li>ton <b>adresse mail</b> et ton <b>mot de passe</b> (chiffré, nous ne pouvons pas le lire), pour te connecter ;</li>
+      <li>ton <b>nom affiché</b> et, si tu le souhaites, ton <b>école</b>, visibles par les autres membres ;</li>
+      <li>les <b>cours</b> que tu ajoutes, les <b>messages</b> du forum, tes <b>« j'aime »</b> et tes <b>signalements</b>.</li>
+    </ul>
+    <p>Ces données servent uniquement à faire fonctionner ton compte, la bibliothèque et le forum. Elles ne sont <b>ni vendues, ni partagées</b> à des fins commerciales. La base légale est ton consentement, donné à l'inscription, et l'exécution du service que tu demandes.</p>
+
+    <h2>Où sont les données ?</h2>
+    <ul>
+      <li>Les pages du site sont hébergées par GitHub Pages (GitHub, Inc.). Comme tout hébergeur, il peut enregistrer techniquement l'adresse IP des visiteurs.</li>
+      <li>Les comptes, les cours et le forum sont stockés chez Supabase, dans un centre de données situé dans l'Union européenne.</li>
+      <li>Les polices de caractères sont hébergées sur le site lui-même : aucun appel n'est fait à Google.</li>
+    </ul>
+
+    <h2>Combien de temps ?</h2>
+    <p>Tes données sont gardées tant que ton compte existe. Quand tu demandes la suppression de ton compte, tes données personnelles, tes cours et tes messages sont effacés dans un délai d'un mois.</p>
+
+    <h2>Tes droits</h2>
+    <ul>
+      <li>Tu peux <b>consulter et modifier</b> ton profil et tes cours à tout moment, dans « Mes cours ».</li>
+      <li>Tu peux demander une <b>copie</b> de tes données, leur <b>correction</b> ou la <b>suppression</b> de ton compte en écrivant à l'adresse de contact ci-dessus.</li>
+      <li>Si tu estimes que tes droits ne sont pas respectés, tu peux introduire une plainte auprès de l'<b>Autorité de protection des données</b> (www.autoriteprotectiondonnees.be).</li>
+    </ul>
+
+    <h2>Cookies</h2>
+    <p>Le site n'utilise <b>aucun cookie publicitaire ni de suivi</b>. Il utilise seulement le stockage local du navigateur pour garder ta connexion ouverte et pour le fonctionnement du jeu.</p>
+  </div>
+</article>
+</main>
+<footer id="site-foot"></footer>
+<script src="lib/supabase.js"></script>
+<script src="config.js"></script>
+<script src="format.js"></script>
+<script src="exemples.js"></script>
+<script src="app.js"></script>
+<script>
+CP.init('confidentialite.html').then(() => {
+  const c = (window.CP_CONFIG || {}).CONTACT_EMAIL;
+  if (c){ const s = document.getElementById('contact'); s.textContent = c; s.className = ''; }
+});
+
+</script>
+</body>
+</html>

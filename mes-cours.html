@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mes cours · Classe Party</title>
+<meta name="description" content="Sauvegarde tes cours Classe Party en ligne et partage-les avec les autres enseignants.">
+<link rel="icon" type="image/png" href="img/favicon.png">
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header id="site-head"></header>
+<main class="wrap" id="main">
+<div class="stack" id="zone">
+  <div class="panel empty"><p class="lead">Chargement…</p></div>
+</div>
+</main>
+<footer id="site-foot"></footer>
+<script src="lib/supabase.js"></script>
+<script src="config.js"></script>
+<script src="format.js"></script>
+<script src="exemples.js"></script>
+<script src="app.js"></script>
+<script>
+(async () => {
+  await CP.init('mes-cours.html');
+  const {el, $} = CP; const zone = $('#zone');
+  CP.onAuthChange = () => location.reload();
+  if (!CP.online || !CP.user){ CP.needLogin(zone, 'sauvegarder et partager tes cours'); return; }
+
+  const opts = (list, val) => list.map(x => el('option', {value: x, selected: x === val ? true : null}, x));
+  /* ---------- profil ---------- */
+  const pName = el('input', {class: 'in', id: 'p-name', maxlength: '40', value: CP.profile ? CP.profile.display_name : ''});
+  const pEcole = el('input', {class: 'in', id: 'p-ecole', maxlength: '80', placeholder: 'Facultatif', value: CP.profile ? CP.profile.ecole || '' : ''});
+  const pMsg = el('p', {class: 'msg', role: 'status'});
+  const profil = el('details', {class: 'panel'},
+    el('summary', {style: 'cursor:pointer'}, el('b', {}, 'Mon profil : '), (CP.profile && CP.profile.display_name) || '', el('span', {class: 'muted'}, ' · ' + CP.user.email)),
+    el('form', {class: 'form', style: 'margin-top:12px', onsubmit: async e => {
+      e.preventDefault();
+      const n = pName.value.trim(); if (n.length < 2){ pMsg.className = 'msg err'; pMsg.textContent = 'Le nom doit faire au moins 2 caractères.'; return; }
+      const {error} = await CP.sb.from('profiles').update({display_name: n, ecole: pEcole.value.trim()}).eq('id', CP.user.id);
+      pMsg.className = 'msg ' + (error ? 'err' : 'ok'); pMsg.textContent = error ? 'Enregistrement impossible.' : 'Profil enregistré.';
+      if (!error){ await CP.loadProfile(); }
+    }}, el('div', {class: 'grid2'}, el('label', {class: 'field'}, el('span', {}, 'Nom affiché'), pName), el('label', {class: 'field'}, el('span', {}, 'École (facultatif)'), pEcole)),
+      el('div', {class: 'btn-row'}, el('button', {class: 'btn small go', type: 'submit'}, 'Enregistrer mon profil')), pMsg));
+
+  /* ---------- formulaire cours ---------- */
+  function courseForm(course, onDone){
+    const isNew = !course;
+    let text = course ? course.contenu : '', parsed = text ? CP.parse(text) : null;
+    const titre = el('input', {class: 'in', maxlength: '80', required: true, value: course ? course.titre : '', placeholder: 'Ex. : Les angles'});
+    const matiere = el('select', {class: 'in'}, opts(CP.MATIERES, course ? course.matiere : 'Mathématiques'));
+    const niveau = el('select', {class: 'in'}, opts(CP.NIVEAUX, course ? course.niveau : '4e primaire'));
+    const desc = el('textarea', {class: 'in', rows: '3', maxlength: '500', placeholder: 'En deux phrases : ce que le cours fait réviser, pour quels élèves.'}, course ? course.description : '');
+    const pub = el('input', {type: 'checkbox', checked: course && course.public ? true : null});
+    const file = el('input', {type: 'file', accept: '.txt,text/plain', class: 'in'});
+    const info = el('div', {class: 'notice', hidden: !parsed});
+    const msg = el('p', {class: 'msg', role: 'status'});
+    const showInfo = () => {
+      if (!parsed){ info.hidden = true; return; }
+      info.hidden = false; info.className = 'notice' + (parsed.total ? '' : ' err');
+      info.replaceChildren(el('b', {}, parsed.total ? 'Fichier lu : ' : 'Aucune question trouvée. '), CP.countLabel(parsed.counts),
+        parsed.errors.length ? el('details', {}, el('summary', {}, `${parsed.errors.length} ligne(s) à vérifier`), el('ul', {}, parsed.errors.slice(0, 20).map(e => el('li', {}, e)))) : null);
+    };
+    file.addEventListener('change', () => {
+      const f = file.files && file.files[0]; if (!f) return;
+      if (f.size > 190000){ msg.className = 'msg err'; msg.textContent = 'Fichier trop gros (200 Ko maximum).'; return; }
+      const rd = new FileReader();
+      rd.onload = () => {
+        text = String(rd.result || ''); parsed = CP.parse(text); showInfo();
+        const s = parsed.data.settings;
+        if (!titre.value.trim()) titre.value = (s.course || s.subtitle || f.name.replace(/\.txt$/i, '').replace(/^Questions-/, '').replace(/-/g, ' ')).slice(0, 80);
+      };
+      rd.readAsText(f, 'utf-8');
+    });
+    showInfo();
+    const save = async () => {
+      if (titre.value.trim().length < 3){ msg.className = 'msg err'; msg.textContent = 'Donne un titre d\'au moins 3 caractères.'; return; }
+      if (!text || !parsed || !parsed.total){ msg.className = 'msg err'; msg.textContent = 'Choisis un fichier de questions (.txt) qui contient au moins une question.'; return; }
+      const row = {titre: titre.value.trim(), matiere: matiere.value, niveau: niveau.value, description: desc.value.trim(), contenu: text, nb_questions: parsed.total, public: pub.checked, updated_at: new Date().toISOString()};
+      const q = isNew ? CP.sb.from('courses').insert(row) : CP.sb.from('courses').update(row).eq('id', course.id);
+      const {error} = await q;
+      if (error){ msg.className = 'msg err'; msg.textContent = 'Enregistrement impossible : ' + error.message; return; }
+      onDone(); CP.toast(isNew ? 'Cours ajouté !' : 'Cours modifié !');
+    };
+    return {fields: [
+      el('label', {class: 'field'}, el('span', {}, isNew ? 'Fichier de questions (.txt)' : 'Remplacer le fichier de questions (facultatif)'), file),
+      el('p', {class: 'small muted'}, 'Ce fichier se crée dans le jeu : Mode prof > Sauvegarde > « Télécharger les questions (.txt) ». Tu peux aussi partir du ', el('a', {href: 'modele-questions.txt', download: true}, 'modèle à remplir'), '.'),
+      info,
+      el('label', {class: 'field'}, el('span', {}, 'Titre du cours'), titre),
+      el('div', {class: 'grid2'}, el('label', {class: 'field'}, el('span', {}, 'Matière'), matiere), el('label', {class: 'field'}, el('span', {}, 'Niveau'), niveau)),
+      el('label', {class: 'field'}, el('span', {}, 'Description'), desc),
+      el('label', {class: 'check'}, pub, el('span', {}, el('b', {}, 'Partager dans la bibliothèque. '), 'Les autres profs pourront le voir, y jouer et le télécharger. Vérifie qu\'il respecte la ', el('a', {href: 'deontologie.html', target: '_blank'}, 'charte'), ' : pas de nom d\'élève, pas de copie de manuel.')),
+      msg], save};
+  }
+  function openForm(course){
+    const f = courseForm(course, () => { close(); loadCourses(); });
+    const close = CP.modal({title: course ? 'Modifier le cours' : 'Ajouter un cours', body: f.fields, foot: [el('button', {type: 'button', class: 'btn go', onclick: f.save}, 'Enregistrer')]});
+  }
+
+  /* ---------- liste ---------- */
+  const list = el('div', {class: 'grid3', id: 'list'});
+  const head = el('section', {class: 'panel'}, el('div', {class: 'btn-row', style: 'justify-content:space-between'},
+    el('div', {class: 'stack', style: 'gap:6px'}, el('h1', {class: 'outline'}, 'Mes cours'), el('p', {class: 'lead'}, 'Tes fichiers de questions, sauvegardés en ligne et disponibles sur tous tes ordinateurs.')),
+    el('button', {type: 'button', class: 'btn go big', onclick: () => openForm(null)}, '+ Ajouter un cours')));
+  zone.replaceChildren(head, profil, list);
+
+  async function loadCourses(){
+    list.replaceChildren(el('p', {class: 'muted'}, 'Chargement…'));
+    const {data, error} = await CP.sb.from('courses').select('*').eq('owner', CP.user.id).order('updated_at', {ascending: false});
+    if (error){ list.replaceChildren(el('p', {class: 'notice err'}, 'Impossible de charger tes cours.')); return; }
+    if (!data.length){ list.replaceChildren(el('div', {class: 'panel empty', style: 'grid-column:1/-1'}, el('h2', {}, 'Aucun cours pour l\'instant'), el('p', {}, 'Ajoute ton premier fichier de questions, ou trouve un cours dans la ', el('a', {href: 'bibliotheque.html'}, 'bibliothèque'), '.'))); return; }
+    list.replaceChildren(...data.map(c => {
+      const del = el('button', {type: 'button', class: 'btn small red'}, 'Supprimer');
+      del.addEventListener('click', async () => {
+        if (!del.dataset.armed){ del.dataset.armed = '1'; del.textContent = 'Sûr ? Re-clique'; setTimeout(() => { del.dataset.armed = ''; del.textContent = 'Supprimer'; }, 3000); return; }
+        const {error} = await CP.sb.from('courses').delete().eq('id', c.id);
+        if (error) CP.toast('Suppression impossible.'); else { CP.toast('Cours supprimé.'); loadCourses(); }
+      });
+      return el('article', {class: 'card'},
+        el('h3', {}, c.titre),
+        el('div', {class: 'meta'}, el('span', {class: 'chip m'}, c.matiere), el('span', {class: 'chip n'}, c.niveau), el('span', {class: 'chip ' + (c.public ? 'pub' : 'priv')}, c.public ? 'Partagé' : 'Privé')),
+        el('p', {class: 'stat'}, `${c.nb_questions} questions · ${c.likes} j'aime · modifié ${CP.ago(c.updated_at)}`),
+        el('div', {class: 'foot'},
+          el('button', {type: 'button', class: 'btn small go', onclick: () => CP.play(c.contenu, c.titre)}, 'Jouer'),
+          el('button', {type: 'button', class: 'btn small blue', onclick: () => CP.preview(c)}, 'Aperçu'),
+          el('button', {type: 'button', class: 'btn small violet', onclick: () => openForm(c)}, 'Modifier'),
+          el('button', {type: 'button', class: 'btn small grey', onclick: () => CP.download('Questions-' + CP.slug(c.titre) + '.txt', c.contenu)}, '.txt'),
+          del));
+    }));
+  }
+  loadCourses();
+})();
+
+</script>
+</body>
+</html>

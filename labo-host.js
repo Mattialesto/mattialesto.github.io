@@ -12,7 +12,7 @@
 
   const LAB = {
     on: false, code: '', ch: null, all: true, phones: {}, q: null,
-    sideAns: new Map(), sendT: null, seq: 0
+    sideAns: new Map(), sendT: null, seq: 0, priceMode: 'auto'
   };
   window.CP_LAB = LAB;
 
@@ -123,6 +123,21 @@
       if (foot.length === 1 && !m.querySelector('.shop-wrap')) foot[0].click();
     }
   }
+
+  /* ---------- prix de la boutique ----------
+     Quand toute la classe répond, chacun gagne bien plus de pièces :
+     les prix sont multipliés (automatique : selon le nombre de joueurs). */
+  function autoMult() { const n = playerList().length; return Math.max(2, Math.min(5, Math.round(1 + 0.3 * (n - 1)))); }
+  function priceMult() {
+    if (!LAB.on || !LAB.all) return 1;
+    return LAB.priceMode === 'auto' ? autoMult() : LAB.priceMode;
+  }
+  const _setNum = setNum;
+  setNum = function (k, d) {
+    const v = _setNum(k, d);
+    return /^price/.test(k) ? Math.max(1, Math.round(v * priceMult())) : v;
+  };
+  function pricesTxt() { return `Dé bonus ${setNum('priceDie', 3)} · Canne à pêche ${setNum('priceFish', 8)} · Glue ${setNum('priceGlue', 4)} pièces`; }
 
   /* ---------- branchement sur le jeu ---------- */
   const _askQuestion = askQuestion;
@@ -238,7 +253,17 @@
       LAB.err ? h('p', {style: 'color:var(--x)'}, LAB.err) : null,
       h('p', {}, `${nPhones()} manette${nPhones() > 1 ? 's' : ''} connectée${nPhones() > 1 ? 's' : ''}`),
       h('div', {class: 'lab-list'}, playerList().filter(p => phonesFor(p.i)).map(p => h('span', {}, h('span', {class: 'tdot', style: '--pc:' + p.color + ';width:16px;height:16px;border-width:2px'}), p.name + (phonesFor(p.i) > 1 ? ' ×' + phonesFor(p.i) : '')))),
-      (() => { const c = h('input', {type: 'checkbox'}); c.checked = LAB.all; c.addEventListener('change', () => { LAB.all = c.checked; }); return h('label', {class: 'lab-chk'}, c, h('span', {}, 'Toute la classe répond à chaque quiz et vrai ou faux (seul le joueur du tour avance ; les autres gagnent 1 pièce s\'ils ont juste).')); })(),
+      (() => { const c = h('input', {type: 'checkbox'}); c.checked = LAB.all; c.addEventListener('change', () => { LAB.all = c.checked; renderSetupBox(); }); return h('label', {class: 'lab-chk'}, c, h('span', {}, 'Toute la classe répond à chaque quiz et vrai ou faux (seul le joueur du tour avance ; les autres gagnent 1 pièce s\'ils ont juste).')); })(),
+      (LAB.all && shopOn()) ? (() => {
+        const sel = h('select', {class: 'in', style: 'width:auto;padding:4px 8px'});
+        [['auto', `Automatique (×${autoMult()} avec ${playerList().length} joueurs)`], [1, 'Prix normaux'], [2, 'Prix ×2'], [3, 'Prix ×3'], [4, 'Prix ×4'], [5, 'Prix ×5']].forEach(([v, l]) => {
+          const o = h('option', {value: String(v)}, l); if (String(v) === String(LAB.priceMode)) o.selected = true; sel.append(o); });
+        sel.addEventListener('change', () => { LAB.priceMode = sel.value === 'auto' ? 'auto' : parseInt(sel.value, 10); renderSetupBox(); });
+        return h('div', {style: 'display:grid;gap:6px'},
+          h('label', {class: 'lab-chk', style: 'align-items:center;flex-wrap:wrap'}, h('span', {}, '🪙 Prix de la boutique :'), sel),
+          h('p', {class: 'small-note', style: 'font-weight:700;color:var(--ink-2)'}, pricesTxt()),
+          h('p', {class: 'small-note', style: 'color:var(--muted)'}, 'Toute la classe gagne des pièces à chaque bonne réponse : les prix augmentent pour que les objets restent précieux.'));
+      })() : null,
       h('div', {}, btn('Arrêter les manettes', 'small grey', () => { stop(); }))].filter(Boolean));
   }
   function addChip() {

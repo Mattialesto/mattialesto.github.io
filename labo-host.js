@@ -71,8 +71,26 @@
       return {type: 'q', title, q: {text: LAB.q.text, vf: LAB.q.vf, opts: LAB.q.opts, revealed: LAB.q.revealed, right: LAB.q.revealed ? LAB.q.right : null, all: LAB.q.all, results: LAB.q.revealed ? LAB.q.results : null}, cont: LAB.q.revealed};
     }
     const foot = [...m.querySelectorAll('.card-foot .btn')].filter(b => !b.hidden);
-    const profOnly = !!m.querySelector('.shop-wrap');
-    return {type: 'other', title, btn: (foot.length === 1 && !profOnly) ? foot[0].textContent : null};
+    if (m.querySelector('.shop-wrap')) return {type: 'shop', title, shop: shopInfo(m)};
+    if (m.querySelector('.secret') && LAB.mime) {
+      const chronoBtn = [...m.querySelectorAll('.secret-row .btn')][1];
+      return {type: 'mime', title, mime: {pid: LAB.mime.pid, word: LAB.mime.word, chrono: !!(chronoBtn && chronoBtn.disabled)}};
+    }
+    return {type: 'other', title, btn: foot.length === 1 ? foot[0].textContent : null};
+  }
+  /* boutique : ce que la manette du joueur doit afficher */
+  function shopInfo(m) {
+    const p = cur(); if (!p) return null;
+    const els = [...m.querySelectorAll('.shop-item')];
+    return {
+      coins: p.coins || 0,
+      items: ITEMS.map((it, i) => {
+        const b = els[i] && els[i].querySelector('.btn');
+        const why = b && b.disabled ? b.textContent : '';
+        return {i, name: it.name, desc: it.desc, price: it.price(), why, target: !!it.target,
+          targets: (it.target && !why) ? validTargets(p, it).map(t => ({pid: G.players.indexOf(t), name: t.name, color: t.color, tours: Math.floor(t.progress / N)})) : []};
+      })
+    };
   }
   function state() {
     const playing = !!(G && Array.isArray(G.players) && !document.getElementById('game').hidden);
@@ -117,10 +135,36 @@
       if (LAB.q.all && !LAB.sideAns.has(pid)) { LAB.sideAns.set(pid, j); refreshCounters(); push(); }
       return;
     }
+    if (!isTurn || m.hidden) return;
     if (a.a === 'cont') {
-      if (!isTurn || m.hidden) return;
       const foot = [...m.querySelectorAll('.card-foot .btn')].filter(b => !b.hidden && !b.disabled);
-      if (foot.length === 1 && !m.querySelector('.shop-wrap')) foot[0].click();
+      if (foot.length === 1 && !m.querySelector('.shop-wrap') && !m.querySelector('.secret')) foot[0].click();
+      return;
+    }
+    /* --- boutique depuis le téléphone --- */
+    if (a.a === 'buy' && m.querySelector('.shop-wrap')) {
+      const i = parseInt(a.i, 10), it = ITEMS[i]; if (!it) return;
+      const item = () => m.querySelectorAll('.shop-item')[i];
+      const b = item() && item().querySelector('.btn');
+      if (!b || b.disabled) return;
+      if (!it.target) { b.click(); return; }
+      const tpid = parseInt(a.t, 10); const target = G.players[tpid];
+      const list = validTargets(cur(), it); const k = list.indexOf(target);
+      if (k < 0) return;
+      if (!item().classList.contains('picking')) b.click();
+      const tb = m.querySelectorAll('.target-btn')[k]; if (tb) tb.click();
+      return;
+    }
+    if (a.a === 'shopdone' && m.querySelector('.shop-wrap')) {
+      const f = m.querySelector('.card-foot .btn'); if (f) f.click();
+      return;
+    }
+    /* --- mime affiché sur le téléphone --- */
+    if (m.querySelector('.secret')) {
+      const row = [...m.querySelectorAll('.secret-row .btn')];
+      const foot = [...m.querySelectorAll('.card-foot .btn')];
+      if (a.a === 'chrono' && row[1] && !row[1].disabled) row[1].click();
+      if (a.a === 'mimerefuse' && foot[2]) foot[2].click();
     }
   }
 
@@ -199,8 +243,28 @@
   }
   ['renderCenter', 'renderSide', 'openModal', 'closeModal', 'renderNames', 'showScreen'].forEach(fn => {
     const orig = window[fn]; if (typeof orig !== 'function') return;
-    window[fn] = function () { const r = orig.apply(this, arguments); if (fn === 'closeModal') LAB.q = null; push(); return r; };
+    window[fn] = function () {
+      const r = orig.apply(this, arguments);
+      if (fn === 'closeModal') { LAB.q = null; LAB.mime = null; }
+      if (fn === 'openModal') hookMime();
+      push(); return r;
+    };
   });
+  /* le mot à mimer part sur le téléphone du joueur, pas au tableau */
+  function hookMime() {
+    LAB.mime = null;
+    const m = document.getElementById('modal'); const sec = m.querySelector('.secret');
+    if (!sec || !G || !LAB.on || !phonesFor(G.turn)) return;
+    LAB.mime = {pid: G.turn, word: sec.textContent};
+    const row = m.querySelector('.secret-row'); const hint = m.querySelector('.hintline');
+    const toggle = row && row.querySelector('.btn');
+    if (toggle) { toggle.textContent = 'Montrer ici quand même'; toggle.classList.remove('pink'); toggle.classList.add('grey', 'small'); }
+    const info = document.createElement('p'); info.className = 'lab-count';
+    info.textContent = `📱 Le mot à mimer s'affiche uniquement sur le téléphone de ${G.players[G.turn].name}.`;
+    if (hint) hint.replaceWith(info); else if (row) row.before(info);
+    const chronoBtn = row && row.querySelectorAll('.btn')[1];
+    if (chronoBtn) chronoBtn.addEventListener('click', () => push());
+  }
   document.addEventListener('input', e => { if (e.target && e.target.closest && e.target.closest('#names')) push(); });
 
   /* ---------- connexion temps réel ---------- */

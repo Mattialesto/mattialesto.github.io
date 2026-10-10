@@ -59,6 +59,18 @@ p{margin:0;font-weight:600;line-height:1.35}
 .status{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--go);border:2px solid var(--ink);margin-right:4px;vertical-align:middle}
 .status.off{background:var(--x)}
 @keyframes pulse{to{transform:scale(1.03)}}
+.shop{display:grid;gap:10px}
+.item{display:grid;gap:6px;background:var(--white);border:3px solid var(--ink);border-radius:16px;padding:10px 12px;box-shadow:0 4px 0 var(--ink)}
+.item.picking{border-color:var(--x);box-shadow:0 4px 0 var(--x)}
+.item-top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.item-top b{font-family:var(--f-display);font-weight:400;font-size:1.25rem}
+.small{font-size:.92rem}
+.coin{font-family:var(--f-display);font-size:1.15rem;white-space:nowrap}
+.purse{font-weight:800;background:var(--white);border:3px solid var(--ink);border-radius:999px;padding:2px 12px}
+.why{font-weight:800;color:var(--muted);text-align:center;background:#eee;border-radius:10px;padding:6px}
+.item .btn{padding:.45em .8em}
+.word{font-family:var(--f-display);font-size:2.6rem;line-height:1.05;text-align:center;background:var(--white);border:4px solid var(--ink);border-radius:18px;padding:22px 12px;overflow-wrap:anywhere;box-shadow:0 6px 0 var(--m)}
+.chrono{font-family:var(--f-display);font-size:2.4rem;text-align:center}
 @media (prefers-reduced-motion: reduce){.btn.huge{animation:none}}
 </style>
 </head>
@@ -94,7 +106,7 @@ p{margin:0;font-weight:600;line-height:1.35}
   const sb = window.supabase.createClient(CFG.SUPABASE_URL, CFG.SUPABASE_ANON_KEY, {auth: {persistSession: false, autoRefreshToken: false}});
   const devId = ss.get('dev') || ('m' + Math.random().toString(36).slice(2, 10)); ss.set('dev', devId);
 
-  let ch = null, code = '', S = null, pid = -1, answered = null, lastQ = '', helloT = null, foundT = null, lastSig = '', lastBuzz = '', lastSeen = 0, lostShown = false;
+  let ch = null, code = '', S = null, pid = -1, answered = null, lastQ = '', helloT = null, foundT = null, lastSig = '', lastBuzz = '', lastSeen = 0, lostShown = false, shopPick = -1, chronoAt = 0, refuseArm = false;
 
   /* ---------- 1. code ---------- */
   function codeScreen(msg) {
@@ -154,6 +166,10 @@ p{margin:0;font-weight:600;line-height:1.35}
     const myTurn = S.turn === pid; const who = S.players[S.turn] || {};
     const card = S.card;
     if (card && card.type === 'q') return questionScreen(card, myTurn, who);
+    if (!card || card.type !== 'shop') shopPick = -1;
+    if (!card || card.type !== 'mime') { chronoAt = 0; refuseArm = false; }
+    if (card && card.type === 'shop') return myTurn ? shopScreen(card.shop) : show(el('div', {class: 'emoji'}, '🛒'), el('h2', {class: 'center'}, (who.name || '…') + ' fait ses achats'), el('p', {class: 'center'}, 'Regarde le tableau.'));
+    if (card && card.type === 'mime') return mimeScreen(card.mime, who);
     answered = null; lastQ = '';
     if (S.paused) return show(el('div', {class: 'emoji'}, '⏸️'), el('h2', {class: 'center'}, 'Pause'), el('p', {class: 'center'}, 'Le jeu est en pause.'));
     if (myTurn && !card && S.phase === 'roll') { const bz = 'roll' + S.turn + '|' + JSON.stringify(S.players[pid]); if (bz !== lastBuzz) { lastBuzz = bz; vib([60, 60, 60]); } return show(el('h2', {class: 'center'}, 'C\'est ton tour !'), el('button', {type: 'button', class: 'btn go huge', onclick: e => { e.currentTarget.disabled = true; act('roll'); }}, '🎲 LANCE LES DÉS !')); }
@@ -162,6 +178,46 @@ p{margin:0;font-weight:600;line-height:1.35}
     return show(el('div', {class: 'emoji'}, '👀'), el('h2', {class: 'center'}, 'Tour de ' + (who.name || '…')), el('p', {class: 'center'}, card ? (card.title || '') + ' Regarde le tableau.' : 'Regarde le tableau.'));
   }
   function show(...kids) { main.replaceChildren(...kids); }
+
+  /* ---------- boutique ---------- */
+  function shopScreen(shop) {
+    if (!shop) return show(el('h2', {}, 'Boutique'), el('p', {}, 'Regarde le tableau.'));
+    const coin = n => el('span', {class: 'coin'}, '🪙 ' + n);
+    const list = el('div', {class: 'shop'});
+    shop.items.forEach(it => {
+      const box = el('div', {class: 'item' + (shopPick === it.i ? ' picking' : '')},
+        el('div', {class: 'item-top'}, el('b', {}, it.name), coin(it.price)),
+        el('p', {class: 'small'}, it.desc));
+      if (it.why) box.append(el('p', {class: 'why'}, it.why));
+      else if (!it.target) box.append(el('button', {type: 'button', class: 'btn go', onclick: e => { e.currentTarget.disabled = true; act('buy', {i: it.i}); }}, 'ACHETER'));
+      else if (shopPick !== it.i) box.append(el('button', {type: 'button', class: 'btn go', onclick: () => { shopPick = it.i; vib(20); render(); }}, 'ACHETER'));
+      else box.append(el('p', {class: 'small'}, el('b', {}, it.i === 1 ? 'À qui veux-tu voler un tour ?' : 'Qui veux-tu coller ?')),
+        el('div', {class: 'names'}, it.targets.map(t => el('button', {type: 'button', class: 'name', onclick: e => { e.currentTarget.disabled = true; shopPick = -1; act('buy', {i: it.i, t: t.pid}); }},
+          el('span', {class: 'dot', style: '--pc:' + t.color}), t.name, el('small', {}, t.tours + ' tour' + (t.tours > 1 ? 's' : ''))))),
+        el('button', {type: 'button', class: 'btn small grey', onclick: () => { shopPick = -1; render(); }}, 'Annuler'));
+      list.append(box);
+    });
+    show(el('div', {class: 'item-top'}, el('h2', {}, '🛒 Boutique'), el('span', {class: 'purse'}, 'Ta bourse : ', coin(shop.coins))),
+      list, el('button', {type: 'button', class: 'btn violet', onclick: e => { e.currentTarget.disabled = true; act('shopdone'); }}, 'TERMINER LES ACHATS'));
+  }
+
+  /* ---------- mime ---------- */
+  function mimeScreen(mime, who) {
+    const mine = mime && mime.pid === pid;
+    if (!mine) { return show(el('div', {class: 'emoji'}, '🎭'), el('h2', {class: 'center'}, (who.name || '…') + ' mime !'), el('p', {class: 'center'}, 'Devine le mot et dis-le à voix haute 🗣️')); }
+    if (mime.chrono && !chronoAt) chronoAt = Date.now();
+    const kids = [el('p', {class: 'center muted'}, '🤫 Ne montre ton écran à personne !'), el('div', {class: 'word'}, mime.word), el('p', {class: 'center'}, 'Mime ce mot sans parler. Les autres doivent deviner !')];
+    if (!mime.chrono) kids.push(el('button', {type: 'button', class: 'btn blue', onclick: e => { e.currentTarget.disabled = true; act('chrono'); }}, '⏱️ Lancer le chrono (1 minute)'));
+    else kids.push(el('div', {class: 'chrono', id: 'chrono'}, '⏱️'));
+    kids.push(el('button', {type: 'button', class: 'btn small grey', style: 'justify-self:center;margin-top:8px', onclick: e => { if (!refuseArm) { refuseArm = true; e.currentTarget.textContent = 'Sûr ? Touche encore (tu recules d\'une case)'; return; } e.currentTarget.disabled = true; act('mimerefuse'); }}, 'Je préfère ne pas mimer'));
+    show(...kids); tickChrono();
+  }
+  function tickChrono() {
+    const c = document.getElementById('chrono'); if (!c || !chronoAt) return;
+    const left = Math.max(0, 60 - Math.floor((Date.now() - chronoAt) / 1000));
+    c.textContent = left ? '⏱️ 0:' + String(left).padStart(2, '0') : '⏱️ Temps écoulé !';
+  }
+  setInterval(tickChrono, 500);
 
   function pickScreen() {
     $('#meBox').replaceChildren();

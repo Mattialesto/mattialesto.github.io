@@ -7,7 +7,7 @@
 <meta name="description" content="Sauvegarde tes cours Classe Party en ligne et partage-les avec les autres enseignants.">
 <link rel="icon" type="image/png" href="img/favicon.png">
 <link rel="stylesheet" href="fonts/fonts.css">
-<link rel="stylesheet" href="style.css?v=20261010c">
+<link rel="stylesheet" href="style.css?v=20261010d">
 </head>
 <body>
 <header id="site-head"></header>
@@ -21,7 +21,7 @@
 <script src="config.js"></script>
 <script src="format.js"></script>
 <script src="exemples.js"></script>
-<script src="app.js?v=20261010c"></script>
+<script src="app.js?v=20261010d"></script>
 <script>
 (async () => {
   await CP.init('mes-cours.html');
@@ -50,8 +50,8 @@
     const isNew = !course;
     let text = course ? course.contenu : '', parsed = text ? CP.parse(text) : null;
     const titre = el('input', {class: 'in', maxlength: '80', required: true, value: course ? course.titre : '', placeholder: 'Ex. : Les angles'});
-    const matiere = el('select', {class: 'in'}, [el('option', {value: '', disabled: true, selected: course ? null : true}, '— Choisis la matière —'), ...opts(CP.MATIERES, course ? course.matiere : '')]);
-    const niveau = el('select', {class: 'in'}, [el('option', {value: '', disabled: true, selected: course ? null : true}, '— Choisis le niveau —'), ...opts(CP.NIVEAUX, course ? course.niveau : '')]);
+    const matiere = el('select', {class: 'in'}, [el('option', {value: '', disabled: true, selected: course ? null : true}, '— Choisis la matière —'), ...CP.groupedOptions(CP.MATIERES_GROUPS, course ? course.matiere : '')]);
+    const niveau = el('select', {class: 'in'}, [el('option', {value: '', disabled: true, selected: course ? null : true}, '— Choisis le niveau —'), ...CP.groupedOptions(CP.NIVEAUX_GROUPS, course ? course.niveau : '')]);
     const desc = el('textarea', {class: 'in', rows: '3', maxlength: '500', placeholder: 'En deux phrases : ce que le cours fait réviser, pour quels élèves.'}, course ? course.description : '');
     const pub = el('input', {type: 'checkbox', checked: course && course.public ? true : null});
     const file = el('input', {type: 'file', accept: '.txt,text/plain', class: 'in'});

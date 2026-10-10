@@ -7,7 +7,7 @@
 <meta name="description" content="Les cours Classe Party partagés par les enseignants : trouve un cours, joue-le en classe ou télécharge-le.">
 <link rel="icon" type="image/png" href="img/favicon.png">
 <link rel="stylesheet" href="fonts/fonts.css">
-<link rel="stylesheet" href="style.css?v=20261010c">
+<link rel="stylesheet" href="style.css?v=20261010d">
 </head>
 <body>
 <header id="site-head"></header>
@@ -36,13 +36,13 @@
 <script src="config.js"></script>
 <script src="format.js"></script>
 <script src="exemples.js"></script>
-<script src="app.js?v=20261010c"></script>
+<script src="app.js?v=20261010d"></script>
 <script>
 (async () => {
   await CP.init('bibliotheque.html');
   const {el, $} = CP;
-  CP.MATIERES.forEach(m => $('#fm').append(el('option', {value: m}, m)));
-  CP.NIVEAUX.forEach(n => $('#fn').append(el('option', {value: n}, n)));
+  $('#fm').append(...CP.groupedOptions(CP.MATIERES_GROUPS, ''));
+  $('#fn').append(...CP.groupedOptions(CP.NIVEAUX_GROUPS, ''));
   const params = new URLSearchParams(location.search);
   if (params.get('matiere')) $('#fm').value = params.get('matiere');
   let myLikes = new Set();

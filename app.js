@@ -12,8 +12,28 @@
   const sb = ONLINE ? window.supabase.createClient(CFG.SUPABASE_URL, CFG.SUPABASE_ANON_KEY) : null;
   const CP = window.CP = {sb, online: ONLINE, user: null, profile: null, version: '1.1', author: 'Manderlier Jérôme'};
 
-  CP.MATIERES = ['Français', 'Mathématiques', 'Sciences', 'Éveil historique', 'Éveil géographique', 'Langues modernes', 'Éducation physique', 'Éducation artistique', 'Philosophie et citoyenneté', 'Religion / Morale', 'Formation professionnelle', 'Informatique', 'Culture générale', 'Autre'];
-  CP.NIVEAUX = ['Maternel', '1re primaire', '2e primaire', '3e primaire', '4e primaire', '5e primaire', '6e primaire', '1re secondaire', '2e secondaire', '3e secondaire', '4e secondaire', '5e secondaire', '6e secondaire', '7e secondaire', 'Enseignement spécialisé', 'Adultes', 'Tous niveaux'];
+  CP.MATIERES_GROUPS = [
+    ['Cours généraux', ['Français', 'Mathématiques', 'Géométrie', 'Calcul', 'Sciences', 'Biologie', 'Chimie', 'Physique', 'Géographie', 'Histoire', 'Éveil historique', 'Éveil géographique', 'Sciences économiques', 'Sciences sociales', 'Philosophie et citoyenneté', 'Religion / Morale', 'Culture générale']],
+    ['Langues', ['Néerlandais', 'Anglais', 'Allemand', 'Espagnol', 'Italien', 'Latin', 'Grec', 'Langues modernes', 'Français langue étrangère (FLE)']],
+    ['Arts, sport et technologie', ['Éducation physique', 'Éducation musicale', 'Éducation artistique', 'Arts plastiques', 'Éducation par la technologie', 'FMTTN (tronc commun)', 'Informatique', 'Éducation aux médias', 'Éducation à la santé']],
+    ['Technique et professionnel', ['Formation professionnelle', 'Technologie du métier', 'Pratique professionnelle', 'Boulangerie-pâtisserie', 'Cuisine et salle', 'Hôtellerie', 'Boucherie-charcuterie', 'Alimentation', 'Vente', 'Bureautique', 'Secrétariat', 'Comptabilité', 'Logistique', 'Coiffure', 'Esthétique', 'Soins aux personnes', 'Puériculture', 'Aide familiale', 'Électricité', 'Électronique', 'Mécanique', 'Mécanique automobile', 'Carrosserie', 'Soudure', 'Construction - gros œuvre', 'Menuiserie', 'Plomberie - chauffage', 'Peinture - décoration', 'Couture - habillement', 'Horticulture', 'Agronomie', 'Entretien - nettoyage', 'Sécurité et hygiène', 'Graphisme', 'Photographie']],
+    ['Autres', ['Remédiation', 'Méthode de travail', 'Orientation', 'Citoyenneté', 'Autre']]
+  ];
+  CP.MATIERES = CP.MATIERES_GROUPS.flatMap(g => g[1]);
+  CP.NIVEAUX_GROUPS = [
+    ['Maternel et primaire', ['Maternel', '1re primaire', '2e primaire', '3e primaire', '4e primaire', '5e primaire', '6e primaire']],
+    ['Secondaire', ['1re secondaire', '2e secondaire', '3e secondaire', '4e secondaire', '5e secondaire', '6e secondaire', '7e secondaire']],
+    ['Enseignement spécialisé', ['Spécialisé primaire', 'Spécialisé forme 1', 'Spécialisé forme 2', 'Spécialisé forme 3', 'Spécialisé forme 4', 'Enseignement spécialisé']],
+    ['Autres', ['DASPA', 'CEFA (alternance)', 'Promotion sociale', 'Adultes', 'Tous niveaux']]
+  ];
+  CP.NIVEAUX = CP.NIVEAUX_GROUPS.flatMap(g => g[1]);
+  /* options groupées pour un <select> ; garde une ancienne valeur qui ne serait plus dans la liste */
+  CP.groupedOptions = function (groups, val) {
+    const out = [];
+    if (val && !groups.some(g => g[1].includes(val))) out.push(el('option', {value: val, selected: true}, val));
+    groups.forEach(([label, items]) => out.push(el('optgroup', {label}, items.map(x => el('option', {value: x, selected: x === val ? true : null}, x)))));
+    return out;
+  };
   CP.FORUM_CATS = {general: 'Discussions générales', cours: 'Partage de cours', aide: 'Aide et questions', idees: 'Idées pour le jeu'};
 
   /* ---------- petit outil pour créer des éléments ---------- */

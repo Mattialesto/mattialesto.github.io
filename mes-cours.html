@@ -50,8 +50,8 @@
     const isNew = !course;
     let text = course ? course.contenu : '', parsed = text ? CP.parse(text) : null;
     const titre = el('input', {class: 'in', maxlength: '80', required: true, value: course ? course.titre : '', placeholder: 'Ex. : Les angles'});
-    const matiere = el('select', {class: 'in'}, opts(CP.MATIERES, course ? course.matiere : 'Mathématiques'));
-    const niveau = el('select', {class: 'in'}, opts(CP.NIVEAUX, course ? course.niveau : '4e primaire'));
+    const matiere = el('select', {class: 'in'}, [el('option', {value: '', disabled: true, selected: course ? null : true}, '— Choisis la matière —'), ...opts(CP.MATIERES, course ? course.matiere : '')]);
+    const niveau = el('select', {class: 'in'}, [el('option', {value: '', disabled: true, selected: course ? null : true}, '— Choisis le niveau —'), ...opts(CP.NIVEAUX, course ? course.niveau : '')]);
     const desc = el('textarea', {class: 'in', rows: '3', maxlength: '500', placeholder: 'En deux phrases : ce que le cours fait réviser, pour quels élèves.'}, course ? course.description : '');
     const pub = el('input', {type: 'checkbox', checked: course && course.public ? true : null});
     const file = el('input', {type: 'file', accept: '.txt,text/plain', class: 'in'});
@@ -77,6 +77,7 @@
     showInfo();
     const save = async () => {
       if (titre.value.trim().length < 3){ msg.className = 'msg err'; msg.textContent = 'Donne un titre d\'au moins 3 caractères.'; return; }
+      if (!matiere.value || !niveau.value){ msg.className = 'msg err'; msg.textContent = 'Choisis la matière et le niveau du cours.'; return; }
       if (!text || !parsed || !parsed.total){ msg.className = 'msg err'; msg.textContent = 'Choisis un fichier de questions (.txt) qui contient au moins une question.'; return; }
       const row = {titre: titre.value.trim(), matiere: matiere.value, niveau: niveau.value, description: desc.value.trim(), contenu: text, nb_questions: parsed.total, public: pub.checked, updated_at: new Date().toISOString()};
       const q = isNew ? CP.sb.from('courses').insert(row) : CP.sb.from('courses').update(row).eq('id', course.id);

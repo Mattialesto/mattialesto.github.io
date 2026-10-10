@@ -73,7 +73,7 @@ main{flex:1;padding-block:28px 48px}
 .nav{order:1}
 .user-box{display:flex;gap:8px;align-items:center;flex-wrap:wrap;order:2}
 .user-box .avatar{width:24px;height:24px;font-size:.75rem}
-@media (max-width:1500px) and (min-width:1181px){.user-name{display:none}}
+@media (min-width:1181px){.user-name{display:none}.nav,.user-box{flex-wrap:nowrap}.brand span{white-space:nowrap}}
 .head-in{flex-wrap:nowrap}
 @media (max-width:1180px){.head-in{flex-wrap:wrap}}
 @media (max-width:1180px){

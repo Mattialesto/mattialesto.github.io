@@ -7,7 +7,7 @@
 <meta name="description" content="L'astuce pour créer en quelques minutes un fichier de questions Classe Party avec une intelligence artificielle : le prompt à copier, étape par étape.">
 <link rel="icon" type="image/png" href="img/favicon.png">
 <link rel="stylesheet" href="fonts/fonts.css">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css?v=20261010b">
 </head>
 <body>
 <header id="site-head"></header>
@@ -117,7 +117,7 @@
       <button type="button" class="btn go" id="copyBtn">Copier le prompt</button>
     </div>
     <p>Après l'avoir collé, remplace les 3 passages <mark>surlignés entre parenthèses</mark> par les infos de ton cours. Tu peux aussi changer le nombre de questions.</p>
-    <pre class="prompt" id="prompt">Tu vas m'aider à créer un fichier de questions pour le jeu de plateau Classe Party.
+    <pre class="prompt" id="prompt" style="white-space:pre-wrap;overflow-wrap:anywhere">Tu vas m'aider à créer un fichier de questions pour le jeu de plateau Classe Party.
 
 Je t'ai joint le fichier modèle « modele-questions.txt ». Respecte scrupuleusement son format :
 - les mêmes sections entre crochets : [RÉGLAGES], [QUIZ], [VRAI-FAUX], [ACTIONS], [MIMES] ;
@@ -152,7 +152,7 @@ Réponds uniquement avec le contenu du fichier .txt, dans un seul bloc à copier
 <script src="config.js"></script>
 <script src="format.js"></script>
 <script src="exemples.js"></script>
-<script src="app.js"></script>
+<script src="app.js?v=20261010b"></script>
 <script>
 CP.init('forum.html').then(() => {
   const btn = document.getElementById('copyBtn');

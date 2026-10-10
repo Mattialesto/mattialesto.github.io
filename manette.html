@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#ffb13b">
+<!-- © 2026 Manderlier Jérôme. Classe Party est sous licence Creative Commons BY-NC-ND 4.0 : utilisation gratuite en classe, toute utilisation commerciale ou revente interdite sans accord écrit de l'auteur. -->
+<title>Manette · Classe Party</title>
+<link rel="icon" type="image/png" href="img/favicon.png">
+<link rel="stylesheet" href="fonts/fonts.css">
+<style>
+*,*::before,*::after{box-sizing:border-box}
+:root{--ink:#3a1d0e;--ink-2:#6b3a1c;--crumb:#fff4d6;--white:#fffdf7;--crust:#f39a26;--sun1:#ffd86e;--sun2:#ffb13b;--go:#4cc94c;--q:#3fa9f5;--v:#9b5de5;--a:#22b8a7;--m:#ff5fa2;--c:#ffc82e;--x:#ef3e36;--muted:#8a6a52;
+  --f-display:"Lilita One","Arial Rounded MT Bold","Trebuchet MS",sans-serif;--f-body:"Baloo 2","Trebuchet MS","Segoe UI",sans-serif;color-scheme:light}
+html,body{height:100%;margin:0}
+body{background:repeating-conic-gradient(from 0deg at 50% 30%,var(--sun1) 0deg 9deg,var(--sun2) 9deg 18deg) fixed;color:var(--ink);font-family:var(--f-body);font-size:17px;-webkit-tap-highlight-color:transparent;overscroll-behavior:none}
+.app{min-height:100%;display:flex;flex-direction:column;gap:12px;padding:calc(10px + env(safe-area-inset-top,0px)) 14px calc(14px + env(safe-area-inset-bottom,0px));max-width:560px;margin-inline:auto}
+.outline{color:var(--white);-webkit-text-stroke:.14em var(--ink);paint-order:stroke fill;text-shadow:0 .08em 0 var(--ink)}
+.top{display:flex;align-items:center;gap:10px}
+.brand{font-family:var(--f-display);font-size:1.5rem;margin-right:auto;line-height:1}
+.panel{background:var(--crumb);border:4px solid var(--ink);border-radius:22px;box-shadow:0 7px 0 var(--ink-2);padding:16px;display:grid;gap:12px}
+h1,h2{margin:0;font-family:var(--f-display);font-weight:400;line-height:1.05}
+h1{font-size:2rem}h2{font-size:1.5rem}
+p{margin:0;font-weight:600;line-height:1.35}
+.muted{color:var(--muted)}
+.btn{--bc:var(--crust);font-family:var(--f-display);font-size:1.2rem;letter-spacing:.02em;line-height:1.1;color:var(--white);text-shadow:0 2px 0 rgba(58,29,14,.55);background:linear-gradient(180deg,rgba(255,255,255,.45) 0 44%,rgba(255,255,255,0) 45%),var(--bc);border:4px solid var(--ink);border-radius:18px;padding:.6em 1em;box-shadow:0 6px 0 var(--ink);cursor:pointer;width:100%;touch-action:manipulation}
+.btn:active{transform:translateY(4px);box-shadow:0 2px 0 var(--ink)}
+.btn[disabled]{filter:grayscale(.6);opacity:.7}
+.btn.go{--bc:var(--go)}.btn.violet{--bc:var(--v)}.btn.grey{--bc:#8d8478}.btn.blue{--bc:var(--q)}
+.btn.small{font-size:.95rem;padding:.35em .8em;border-width:3px;border-radius:12px;box-shadow:0 4px 0 var(--ink);width:auto}
+.btn.huge{font-size:2rem;padding:1em .6em;border-radius:26px;animation:pulse .8s ease-in-out infinite alternate}
+.in{width:100%;font:inherit;font-family:var(--f-display);font-size:2.4rem;letter-spacing:.2em;text-align:center;color:var(--ink);background:var(--white);border:4px solid var(--ink);border-radius:16px;padding:6px}
+.err{color:var(--x);font-weight:800}
+.names{display:grid;gap:8px}
+.name{display:flex;align-items:center;gap:10px;width:100%;text-align:left;font:inherit;font-weight:800;font-size:1.15rem;color:var(--ink);background:var(--white);border:3px solid var(--ink);border-radius:14px;padding:8px 12px;box-shadow:0 4px 0 var(--ink);cursor:pointer}
+.name small{margin-left:auto;font-weight:700;color:var(--muted);font-size:.8rem}
+.dot{flex:none;width:24px;height:24px;border-radius:50%;border:3px solid var(--ink);background:radial-gradient(circle at 33% 28%,rgba(255,255,255,.85) 0 18%,rgba(255,255,255,0) 19%),var(--pc,var(--crust))}
+.me{display:flex;align-items:center;gap:10px;background:var(--white);border:3px solid var(--ink);border-radius:999px;padding:4px 12px 4px 6px;font-weight:800}
+.me b{font-family:var(--f-display);font-weight:400;font-size:1.15rem}
+.me span{color:var(--ink-2);font-size:.9rem}
+.qtext{font-size:1.25rem;font-weight:800;line-height:1.2}
+.answers{display:grid;gap:12px}
+.answers.two{grid-template-columns:1fr 1fr}
+.ans{--bc:var(--q);display:flex;align-items:center;gap:12px;width:100%;text-align:left;font:inherit;font-weight:800;font-size:1.15rem;line-height:1.15;color:#fff;text-shadow:0 2px 0 rgba(58,29,14,.6);background:linear-gradient(180deg,rgba(255,255,255,.35) 0 44%,rgba(255,255,255,0) 45%),var(--bc);border:4px solid var(--ink);border-radius:18px;padding:16px 14px;box-shadow:0 6px 0 var(--ink);cursor:pointer;min-height:68px;touch-action:manipulation}
+.ans:active{transform:translateY(3px);box-shadow:0 3px 0 var(--ink)}
+.ans .tag{flex:none;display:grid;place-items:center;width:1.9em;height:1.9em;border-radius:10px;background:#fff;color:var(--ink);text-shadow:none;border:3px solid var(--ink);font-family:var(--f-display);font-weight:400}
+.ans span:last-child{min-width:0;overflow-wrap:anywhere}
+.a0{--bc:#e8413b}.a1{--bc:#2f8fe0}.a2{--bc:#e8a412}.a3{--bc:#3aa83a}
+.ans.vrai{--bc:var(--go);justify-content:center;font-family:var(--f-display);font-weight:400;font-size:1.9rem;min-height:120px}
+.ans.faux{--bc:var(--x);justify-content:center;font-family:var(--f-display);font-weight:400;font-size:1.9rem;min-height:120px}
+.big{font-family:var(--f-display);font-size:2rem;text-align:center;line-height:1.1}
+.ok{color:var(--go);-webkit-text-stroke:.06em var(--ink);paint-order:stroke fill}
+.ko{color:var(--x);-webkit-text-stroke:.06em var(--ink);paint-order:stroke fill}
+.center{text-align:center}
+.emoji{font-size:3.4rem;text-align:center;line-height:1}
+.foot{margin-top:auto;display:flex;justify-content:space-between;gap:10px;align-items:center;font-size:.8rem;font-weight:700;color:var(--ink)}
+.foot button{font:inherit;background:none;border:0;text-decoration:underline;color:var(--ink);cursor:pointer;padding:4px}
+.status{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--go);border:2px solid var(--ink);margin-right:4px;vertical-align:middle}
+.status.off{background:var(--x)}
+@keyframes pulse{to{transform:scale(1.03)}}
+@media (prefers-reduced-motion: reduce){.btn.huge{animation:none}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top"><div class="brand outline">Classe Party</div><div id="meBox"></div></div>
+  <main id="main" class="panel" aria-live="polite"></main>
+  <div class="foot"><span><span class="status off" id="net"></span><span id="netTxt">Hors ligne</span></span><span id="footBtns"></span></div>
+</div>
+<script src="lib/supabase.js"></script>
+<script src="config.js"></script>
+<script>
+(function () {
+  'use strict';
+  const CFG = window.CP_CONFIG || {};
+  const main = document.getElementById('main');
+  const $ = s => document.querySelector(s);
+  function el(tag, props, ...kids) {
+    const e = document.createElement(tag);
+    for (const [k, v] of Object.entries(props || {})) {
+      if (v === null || v === undefined || v === false) continue;
+      if (k === 'class') e.className = v; else if (k === 'style') e.style.cssText = v;
+      else if (k.startsWith('on') && typeof v === 'function') e.addEventListener(k.slice(2), v);
+      else if (v === true) e.setAttribute(k, ''); else e.setAttribute(k, v);
+    }
+    kids.flat(Infinity).forEach(c => { if (c === null || c === undefined || c === false) return; e.append(c.nodeType ? c : document.createTextNode(String(c))); });
+    return e;
+  }
+  const ss = {get(k) { try { return JSON.parse(sessionStorage.getItem('cpm-' + k)); } catch (e) { return null; } }, set(k, v) { try { sessionStorage.setItem('cpm-' + k, JSON.stringify(v)); } catch (e) {} }, del(k) { try { sessionStorage.removeItem('cpm-' + k); } catch (e) {} }};
+  const vib = ms => { try { navigator.vibrate && navigator.vibrate(ms); } catch (e) {} };
+
+  if (!window.supabase || !CFG.SUPABASE_URL) { main.replaceChildren(el('h2', {}, 'Manette indisponible'), el('p', {}, 'Le site n\'est pas encore relié à son serveur.')); return; }
+  const sb = window.supabase.createClient(CFG.SUPABASE_URL, CFG.SUPABASE_ANON_KEY, {auth: {persistSession: false, autoRefreshToken: false}});
+  const devId = ss.get('dev') || ('m' + Math.random().toString(36).slice(2, 10)); ss.set('dev', devId);
+
+  let ch = null, code = '', S = null, pid = -1, answered = null, lastQ = '', helloT = null, foundT = null, lastSig = '', lastBuzz = '', lastSeen = 0, lostShown = false;
+
+  /* ---------- 1. code ---------- */
+  function codeScreen(msg) {
+    const inp = el('input', {class: 'in', inputmode: 'numeric', maxlength: '5', autocomplete: 'off', placeholder: '•••••', 'aria-label': 'Code de la partie'});
+    inp.value = code || '';
+    const go = () => { const c = inp.value.replace(/\D/g, ''); if (c.length !== 5) { err.textContent = 'Le code a 5 chiffres.'; return; } join(c); };
+    const err = el('p', {class: 'err'}, msg || '');
+    inp.addEventListener('keydown', e => { if (e.key === 'Enter') go(); });
+    main.replaceChildren(el('h1', {class: 'outline'}, 'Rejoindre'), el('p', {}, 'Tape le code affiché au tableau.'), inp, err, el('button', {type: 'button', class: 'btn go', onclick: go}, 'REJOINDRE'));
+    $('#meBox').replaceChildren(); $('#footBtns').replaceChildren();
+    setTimeout(() => { try { inp.focus(); } catch (e) {} }, 100);
+  }
+
+  /* ---------- 2. connexion ---------- */
+  function join(c) {
+    leave(); code = c; ss.set('code', c);
+    main.replaceChildren(el('h2', {}, 'Connexion…'), el('p', {class: 'muted'}, 'On cherche la partie ' + c + '.'));
+    ch = sb.channel('cp-' + c, {config: {broadcast: {self: false}, presence: {key: devId}}});
+    ch.on('broadcast', {event: 'state'}, ({payload}) => onState(payload))
+      .subscribe(status => {
+        if (status === 'SUBSCRIBED') {
+          net(true); track(); hello();
+          clearTimeout(foundT); foundT = setTimeout(() => { if (!S) { leave(); ss.del('code'); codeScreen('Partie introuvable. Vérifie le code, ou demande au prof d\'activer les manettes.'); } }, 6000);
+        } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') net(false);
+      });
+  }
+  function leave() { if (ch) { try { sb.removeChannel(ch); } catch (e) {} } ch = null; S = null; lastSig = ''; clearInterval(helloT); }
+  function hello() { send('hello', {dev: devId}); clearInterval(helloT); helloT = setInterval(() => { if (!S) send('hello', {dev: devId}); }, 2000); }
+  function send(ev, payload) { if (!ch) return; try { ch.send({type: 'broadcast', event: ev, payload}); } catch (e) {} }
+  function track() { if (!ch) return; try { ch.track({pid, at: Date.now()}); } catch (e) {} }
+  function act(a, extra) { vib(30); send('act', Object.assign({dev: devId, pid, a}, extra || {})); }
+  function net(on) { $('#net').className = 'status' + (on ? '' : ' off'); $('#netTxt').textContent = on ? 'Connecté · partie ' + code : 'Connexion perdue…'; }
+
+  /* ---------- 3. état reçu du tableau ---------- */
+  function onState(st) {
+    if (!st || !Array.isArray(st.players)) return;
+    lastSeen = Date.now(); if (lostShown) { lostShown = false; lastSig = ''; }
+    const sig = JSON.stringify(Object.assign({}, st, {seq: 0}));
+    if (sig === lastSig) return;
+    lastSig = sig;
+    const first = !S; S = st;
+    if (first) { const saved = ss.get('pid'); if (saved !== null && saved >= 0 && saved < st.players.length && ss.get('code') === code) { pid = saved; track(); } }
+    if (pid >= st.players.length) pid = -1;
+    render();
+  }
+  function choose(i) { pid = i; ss.set('pid', i); answered = null; track(); vib(40); render(); }
+  function rerender() { render(); }
+
+  function render() {
+    if (!S) return;
+    $('#footBtns').replaceChildren(el('button', {type: 'button', onclick: () => { pid = -1; ss.del('pid'); track(); render(); }}, 'Changer de joueur'), el('button', {type: 'button', onclick: () => { leave(); ss.del('code'); ss.del('pid'); pid = -1; code = ''; codeScreen(); }}, 'Quitter'));
+    if (pid < 0) return pickScreen();
+    const me = S.players[pid];
+    $('#meBox').replaceChildren(el('div', {class: 'me'}, el('span', {class: 'dot', style: '--pc:' + me.color}), el('b', {}, me.name), (S.playing && S.shop && me.coins !== null) ? el('span', {}, '🪙 ' + me.coins) : null, (S.playing && me.tours !== null) ? el('span', {}, '· ' + me.tours + ' tour' + (me.tours > 1 ? 's' : '')) : null));
+    if (!S.playing) return show(el('div', {class: 'emoji'}, '⏳'), el('h2', {class: 'center'}, 'Tu es prêt !'), el('p', {class: 'center'}, 'La partie va bientôt commencer. Regarde le tableau.'));
+    if (S.over) return show(el('div', {class: 'emoji'}, '🏆'), el('h2', {class: 'center'}, 'Partie terminée !'), el('p', {class: 'center'}, 'Regarde le tableau pour les étoiles bonus et le podium.'));
+    const myTurn = S.turn === pid; const who = S.players[S.turn] || {};
+    const card = S.card;
+    if (card && card.type === 'q') return questionScreen(card, myTurn, who);
+    answered = null; lastQ = '';
+    if (S.paused) return show(el('div', {class: 'emoji'}, '⏸️'), el('h2', {class: 'center'}, 'Pause'), el('p', {class: 'center'}, 'Le jeu est en pause.'));
+    if (myTurn && !card && S.phase === 'roll') { const bz = 'roll' + S.turn + '|' + JSON.stringify(S.players[pid]); if (bz !== lastBuzz) { lastBuzz = bz; vib([60, 60, 60]); } return show(el('h2', {class: 'center'}, 'C\'est ton tour !'), el('button', {type: 'button', class: 'btn go huge', onclick: e => { e.currentTarget.disabled = true; act('roll'); }}, '🎲 LANCE LES DÉS !')); }
+    if (myTurn && card) return show(el('h2', {class: 'center'}, card.title || 'À toi !'), el('p', {class: 'center'}, 'Regarde le tableau.'), card.btn ? el('button', {type: 'button', class: 'btn violet', onclick: e => { e.currentTarget.disabled = true; act('cont'); }}, card.btn) : el('p', {class: 'center muted'}, 'Le prof va valider.'));
+    if (myTurn) return show(el('div', {class: 'emoji'}, '🎲'), el('h2', {class: 'center'}, 'C\'est ton tour !'), el('p', {class: 'center'}, 'Regarde ton pion avancer au tableau.'));
+    return show(el('div', {class: 'emoji'}, '👀'), el('h2', {class: 'center'}, 'Tour de ' + (who.name || '…')), el('p', {class: 'center'}, card ? (card.title || '') + ' Regarde le tableau.' : 'Regarde le tableau.'));
+  }
+  function show(...kids) { main.replaceChildren(...kids); }
+
+  function pickScreen() {
+    $('#meBox').replaceChildren();
+    show(el('h2', {}, 'Qui es-tu ?'), el('p', {class: 'muted'}, 'Touche ton prénom ou le nom de ton équipe.'),
+      el('div', {class: 'names'}, S.players.map((p, i) => el('button', {type: 'button', class: 'name', onclick: () => choose(i)}, el('span', {class: 'dot', style: '--pc:' + p.color}), p.name))));
+  }
+
+  function questionScreen(card, myTurn, who) {
+    const q = card.q || {}; const key = (q.text || '') + '|' + S.turn;
+    if (key !== lastQ) { lastQ = key; answered = null; if (myTurn || q.all) vib(50); }
+    const canAnswer = myTurn || q.all;
+    const head = el('p', {class: 'muted'}, myTurn ? 'C\'est ta question !' : (q.all ? 'Tout le monde répond ! Question de ' + (who.name || '') : 'Question de ' + (who.name || '')));
+    if (q.revealed) {
+      const mine = answered;
+      const right = q.right;
+      const ok = mine !== null && mine === right;
+      const rightTxt = q.vf ? (q.opts[right] || '') : ['A', 'B', 'C', 'D'][right] + '. ' + (q.opts[right] || '');
+      const kids = [head, el('p', {class: 'qtext'}, q.text)];
+      if (mine === null) kids.push(el('p', {class: 'big'}, '⏱️'), el('p', {class: 'center'}, 'Tu n\'as pas répondu.'));
+      else { kids.push(el('p', {class: 'big ' + (ok ? 'ok' : 'ko')}, ok ? 'BONNE RÉPONSE !' : 'RATÉ…')); if (ok && !myTurn && S.shop) kids.push(el('p', {class: 'center'}, '+1 pièce 🪙')); if (lastBuzz !== 'rev' + key) { lastBuzz = 'rev' + key; vib(ok ? [40, 40, 120] : 200); } }
+      if (!ok) kids.push(el('p', {class: 'center'}, 'La bonne réponse : ', el('b', {}, rightTxt)));
+      if (myTurn && card.cont) kids.push(el('button', {type: 'button', class: 'btn go', onclick: e => { e.currentTarget.disabled = true; act('cont'); }}, 'CONTINUER'));
+      return show(...kids);
+    }
+    if (!canAnswer) return show(head, el('p', {class: 'qtext'}, q.text), el('p', {class: 'center'}, '👀 Regarde le tableau.'));
+    if (answered !== null) return show(head, el('p', {class: 'qtext'}, q.text), el('div', {class: 'emoji'}, '✅'), el('p', {class: 'center'}, 'Réponse envoyée : ', el('b', {}, q.vf ? q.opts[answered] : ['A', 'B', 'C', 'D'][answered])), el('p', {class: 'center muted'}, 'Attends la correction au tableau.'));
+    const pick = j => { answered = j; act('ans', {j}); render(); };
+    const box = el('div', {class: 'answers' + (q.vf ? ' two' : '')});
+    if (q.vf) {
+      (q.opts || []).forEach((o, j) => box.append(el('button', {type: 'button', class: 'ans ' + (/vrai/i.test(o) ? 'vrai' : 'faux'), onclick: () => pick(j)}, o.toUpperCase())));
+    } else {
+      (q.opts || []).forEach((o, j) => box.append(el('button', {type: 'button', class: 'ans a' + j, onclick: () => pick(j)}, el('span', {class: 'tag'}, ['A', 'B', 'C', 'D'][j]), el('span', {}, o))));
+    }
+    show(head, el('p', {class: 'qtext'}, q.text), box);
+  }
+
+  setInterval(() => {
+    if (!S || !ch || lostShown) return;
+    if (Date.now() - lastSeen > 25000) {
+      lostShown = true;
+      show(el('div', {class: 'emoji'}, '📡'), el('h2', {class: 'center'}, 'Plus de nouvelles du tableau'), el('p', {class: 'center'}, 'Le prof a peut-être fermé ou relancé la partie. Attends un instant, ou entre le nouveau code.'),
+        el('button', {type: 'button', class: 'btn violet', onclick: () => { leave(); ss.del('code'); ss.del('pid'); pid = -1; code = ''; codeScreen(); }}, 'Entrer un nouveau code'));
+    }
+  }, 5000);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden && ch && code) { send('hello', {dev: devId}); track(); } });
+
+  const urlCode = (new URLSearchParams(location.search).get('code') || '').replace(/\D/g, '');
+  const savedCode = ss.get('code');
+  if (urlCode.length === 5) join(urlCode);
+  else if (savedCode) join(savedCode);
+  else codeScreen();
+})();
+</script>
+</body>
+</html>

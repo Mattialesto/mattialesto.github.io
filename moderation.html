@@ -7,7 +7,7 @@
 <meta name="description" content="Espace de modération réservé aux administrateurs de Classe Party.">
 <link rel="icon" type="image/png" href="img/favicon.png">
 <link rel="stylesheet" href="fonts/fonts.css">
-<link rel="stylesheet" href="style.css?v=20261010d">
+<link rel="stylesheet" href="style.css?v=20261010e">
 </head>
 <body>
 <header id="site-head"></header>
@@ -19,7 +19,7 @@
 <script src="config.js"></script>
 <script src="format.js"></script>
 <script src="exemples.js"></script>
-<script src="app.js?v=20261010d"></script>
+<script src="app.js?v=20261010e"></script>
 <script>
 (async () => {
   await CP.init('moderation.html');
@@ -33,7 +33,21 @@
   zone.replaceChildren(el('section', {class: 'panel stack'},
     el('h1', {class: 'outline'}, 'Modération'),
     el('p', {class: 'lead'}, 'Les contenus signalés par les membres. Vérifie chaque signalement, puis supprime le contenu ou marque le signalement comme traité.'),
-    el('label', {class: 'check'}, showDone, el('span', {}, 'Afficher aussi les signalements déjà traités')), list));
+    el('label', {class: 'check'}, showDone, el('span', {}, 'Afficher aussi les signalements déjà traités')), list),
+    el('section', {class: 'panel stack', style: 'border-style:dashed'},
+      el('h2', {}, '🛠️ Labo ', el('span', {class: 'chip', style: 'background:#efe6ff'}, 'réservé à l\'administrateur')),
+      el('p', {class: 'muted'}, 'Les fonctions en test. Personne d\'autre ne les voit : elles ne sont liées nulle part sur le site et ne s\'activent que pour un compte administrateur.'),
+      el('div', {class: 'paper stack', style: 'align-content:start'},
+        el('h3', {}, '📱 Manettes : les élèves jouent avec leur téléphone'),
+        el('p', {}, 'Le plateau reste au tableau. Les élèves rejoignent avec un QR code, lancent les dés et répondent aux quiz et vrai ou faux depuis leur téléphone ou une tablette. Option : toute la classe répond à chaque question.'),
+        el('ol', {style: 'margin:0;padding-left:1.3em;display:grid;gap:4px'},
+          el('li', {}, 'Ouvre le jeu avec le bouton ci-dessous (reste connecté au site sur ce navigateur).'),
+          el('li', {}, 'Dans « Nouvelle partie », clique sur « Activer les manettes ».'),
+          el('li', {}, 'Scanne le QR code avec un téléphone, choisis un prénom, puis lance la partie.')),
+        el('p', {class: 'small muted'}, 'Pour tester seul : ouvre aussi une manette dans un autre onglet, ou sur ton téléphone.'),
+        el('div', {class: 'btn-row'},
+          el('a', {class: 'btn violet', href: 'jouer.html?labo=1', target: '_blank', rel: 'noopener'}, 'Lancer le jeu avec les manettes'),
+          el('a', {class: 'btn small grey', href: 'manette.html', target: '_blank', rel: 'noopener'}, 'Ouvrir une manette')))));
   showDone.addEventListener('change', load);
   async function open(r){
     if (r.cible_type === 'cours'){

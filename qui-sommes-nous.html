@@ -19,21 +19,19 @@
       <p class="lead">Classe Party, c'est d'abord un prof qui voulait que ses élèves aient envie de réviser.</p>
     </div>
     <div style="display:grid;place-items:center">
-      <div class="paper" style="width:min(260px,100%);aspect-ratio:1;display:grid;place-items:center;text-align:center;border-style:dashed">
-        <span class="todo">[Ta photo ici]<br><small>Remplace ce cadre par img/photo.jpg</small></span>
-      </div>
+      <img src="img/photo.jpg" alt="Jérôme Manderlier, créateur de Classe Party" width="225" height="406" style="width:min(220px,70vw);height:auto;aspect-ratio:225/406;object-fit:cover;border:4px solid var(--ink);border-radius:22px;box-shadow:0 6px 0 var(--ink);transform:rotate(-2deg)">
     </div>
   </section>
 
   <section class="panel">
     <div class="prose">
       <h2>Jérôme Manderlier</h2>
-      <p>Je suis enseignant en <b>boulangerie-pâtisserie</b> dans l'<b>enseignement secondaire spécialisé</b> (forme 3), en Fédération Wallonie-Bruxelles, <span class="todo">[à l'école …, à …, depuis … ans]</span>.</p>
+      <p>Je suis enseignant en <b>boulangerie-pâtisserie</b> dans l'<b>enseignement secondaire spécialisé</b> (forme 3), en Fédération Wallonie-Bruxelles, à l'<b>E.E.S.P.S.C.F. de Châtelet</b>.</p>
       <p>Mes élèves apprennent un métier avec leurs mains. Pour beaucoup d'entre eux, l'école a souvent rimé avec difficulté. Mon défi de tous les jours : leur donner confiance, et leur faire retenir la théorie sans passer par de longues pages à lire.</p>
-      <p class="todo">[Ajoute ici quelques lignes plus personnelles : ton parcours, ce que tu aimes dans ton métier, une anecdote de classe…]</p>
+      <p>J'ai imaginé ce jeu parce qu'il est difficile de garder ses élèves attentifs du début à la fin d'un cours. Et la technologie ne cesse d'évoluer : je me suis dit qu'il était grand temps, nous enseignants, de nous mettre à jour, et de faire de ces outils un allié pour donner envie d'apprendre.</p>
 
       <h2>L'histoire du jeu</h2>
-      <p>Tout a commencé par un simple Kahoot sur le matériel de la boulangerie. Les élèves ont adoré, mais tout le monde regardait son écran, et l'ambiance retombait vite. J'ai voulu quelque chose de plus vivant : un vrai plateau projeté au tableau, des dés, des mimes, des défis, des retournements de situation… et un peu de suspense jusqu'à la dernière seconde.</p>
+      <p>Tout a commencé par un simple quiz en ligne sur le matériel de la boulangerie. Les élèves ont adoré, mais tout le monde regardait son écran, et l'ambiance retombait vite. J'ai voulu quelque chose de plus vivant : un vrai plateau projeté au tableau, des dés, des mimes, des défis, des retournements de situation… et un peu de suspense jusqu'à la dernière seconde.</p>
       <p>Le jeu s'est appelé d'abord « Le Grand Tour du Mitron ». Très vite, je me suis dit qu'il pouvait servir à tous les cours et à tous les âges : il est devenu <b>Classe Party</b>.</p>
 
       <h2>Ce que je veux faire avec Classe Party</h2>
@@ -44,7 +42,7 @@
       </ul>
 
       <h2>Me contacter</h2>
-      <p>Une idée, une remarque, une envie de participer ? Le plus simple est de poster sur le <a href="forum.html">forum</a>. Tu peux aussi m'écrire : <span id="contact" class="todo">[adresse mail de contact à compléter dans config.js]</span>.</p>
+      <p>Une idée, une remarque, une envie de participer ? Le plus simple est de poster sur le <a href="forum.html">forum</a>. <span id="contactWrap" hidden> Tu peux aussi m'écrire : <a id="contact" href="#"></a>.</span></p>
     </div>
   </section>
 </div>
@@ -58,7 +56,7 @@
 <script>
 CP.init('qui-sommes-nous.html').then(() => {
   const c = (window.CP_CONFIG || {}).CONTACT_EMAIL;
-  if (c){ const s = document.getElementById('contact'); s.textContent = c; s.className = ''; }
+  if (c){ const a = document.getElementById('contact'); a.textContent = c; a.href = 'mailto:' + c; document.getElementById('contactWrap').hidden = false; }
 });
 
 </script>

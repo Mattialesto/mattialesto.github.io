@@ -1,0 +1,32 @@
+Classe Party - © 2026 Jérôme Manderlier
+
+Le jeu Classe Party (code, plateau, règles, textes, tutoriel,
+musiques, logo et illustrations) et le site classeparty.github.io
+sont protégés par le droit d'auteur.
+
+Ils sont mis à disposition sous la licence Creative Commons
+Attribution - Pas d'utilisation commerciale - Pas de modification
+4.0 International (CC BY-NC-ND 4.0) :
+https://creativecommons.org/licenses/by-nc-nd/4.0/deed.fr
+
+PERMIS, gratuitement :
+- utiliser le jeu en classe, à l'école, en formation ;
+- le copier et le partager, en gardant le nom de l'auteur et cette licence ;
+- ajouter ses propres questions avec le mode prof (ces questions
+  appartiennent à leur auteur).
+
+INTERDIT sans accord écrit de l'auteur :
+- toute utilisation commerciale : vente, location, abonnement,
+  inclusion dans un produit ou un service payant ;
+- la modification du jeu ou du site et la diffusion d'une version
+  modifiée, ou la reprise de parties du code dans un autre logiciel ;
+- la publication sous un autre nom ou sans le nom de l'auteur.
+
+Le nom et le logo « Classe Party » désignent le jeu de Jérôme Manderlier
+et ne peuvent pas être utilisés pour un autre produit.
+
+Les bibliothèques incluses dans le dossier lib/ (supabase-js, licence MIT)
+et les polices du dossier fonts/ (Lilita One et Baloo 2, licence SIL OFL 1.1)
+restent soumises à leurs propres licences.
+
+Texte détaillé : https://classeparty.github.io/licence.html

@@ -88,7 +88,7 @@
     if (!CP.online){
       rows = examples().filter(c => (!fm || c.matiere === fm) && (!fn || c.niveau === fn) && (!q || (c.titre + ' ' + c.description).toLowerCase().includes(q.toLowerCase())));
     } else {
-      let req = CP.sb.from('courses').select('id,titre,matiere,niveau,description,nb_questions,likes,created_at,owner,profiles(display_name)').eq('public', true);
+      let req = CP.sb.from('courses').select('id,titre,matiere,niveau,description,nb_questions,likes,created_at,owner,profiles!owner(display_name)').eq('public', true);
       if (fm) req = req.eq('matiere', fm);
       if (fn) req = req.eq('niveau', fn);
       if (q) req = req.or(`titre.ilike.%${q}%,description.ilike.%${q}%`);

@@ -48,7 +48,7 @@
     const newBtn = el('button', {type: 'button', class: 'btn go', onclick: newTopic}, '+ Nouveau sujet');
     const list = el('div', {class: 'stack', style: 'gap:10px'}, el('p', {class: 'muted'}, 'Chargement…'));
     zone.replaceChildren(intro, el('section', {class: 'panel stack'}, el('div', {class: 'btn-row', style: 'justify-content:space-between'}, tabs, newBtn), list));
-    let req = CP.sb.from('forum_topics').select('id,titre,categorie,nb_messages,last_post_at,created_at,profiles(display_name)').order('last_post_at', {ascending: false}).limit(100);
+    let req = CP.sb.from('forum_topics').select('id,titre,categorie,nb_messages,last_post_at,created_at,profiles!author(display_name)').order('last_post_at', {ascending: false}).limit(100);
     if (cat) req = req.eq('categorie', cat);
     const {data, error} = await req;
     if (error){ list.replaceChildren(el('p', {class: 'notice err'}, 'Le forum n\'a pas pu être chargé.')); return; }
@@ -74,7 +74,7 @@
       }}, 'Publier')]});
   }
   async function topicView(){
-    const {data: t, error} = await CP.sb.from('forum_topics').select('id,titre,categorie,author,created_at,profiles(display_name)').eq('id', topicId).maybeSingle();
+    const {data: t, error} = await CP.sb.from('forum_topics').select('id,titre,categorie,author,created_at,profiles!author(display_name)').eq('id', topicId).maybeSingle();
     if (error || !t){ zone.replaceChildren(el('div', {class: 'panel empty'}, el('h2', {}, 'Sujet introuvable'), el('a', {class: 'btn blue', href: 'forum.html'}, 'Retour au forum'))); return; }
     const posts = el('div', {class: 'stack', style: 'gap:10px'});
     const reply = el('textarea', {class: 'in', rows: '4', maxlength: '5000', placeholder: 'Ta réponse…'});
@@ -103,7 +103,7 @@
         }}, 'Supprimer le sujet') : null),
       posts, replyBox));
     async function loadPosts(){
-      const {data, error: er} = await CP.sb.from('forum_posts').select('id,contenu,created_at,author,profiles(display_name)').eq('topic_id', t.id).order('created_at');
+      const {data, error: er} = await CP.sb.from('forum_posts').select('id,contenu,created_at,author,profiles!author(display_name)').eq('topic_id', t.id).order('created_at');
       if (er){ posts.replaceChildren(el('p', {class: 'notice err'}, 'Messages indisponibles.')); return; }
       posts.replaceChildren(...data.map(p => el('article', {class: 'post'},
         el('div', {class: 'who'}, el('span', {class: 'avatar', 'aria-hidden': 'true'}, CP.initials(who(p.profiles))), who(p.profiles), el('span', {class: 'muted small'}, CP.ago(p.created_at)),

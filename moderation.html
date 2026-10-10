@@ -48,7 +48,7 @@
   }
   async function load(){
     list.replaceChildren(el('p', {class: 'muted'}, 'Chargement…'));
-    let req = CP.sb.from('reports').select('id,cible_type,cible_id,raison,traite,created_at,profiles(display_name)').order('created_at', {ascending: false}).limit(200);
+    let req = CP.sb.from('reports').select('id,cible_type,cible_id,raison,traite,created_at,profiles!reporter(display_name)').order('created_at', {ascending: false}).limit(200);
     if (!showDone.checked) req = req.eq('traite', false);
     const {data, error} = await req;
     if (error){ list.replaceChildren(el('p', {class: 'notice err'}, 'Impossible de charger les signalements.')); return; }

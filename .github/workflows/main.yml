@@ -1,0 +1,57 @@
+name: Pages Deploy
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: publish
+  cancel-in-progress: false
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - name: Build with Jekyll
+        uses: actions/jekyll-build-pages@v1
+        with:
+          source: ./
+          destination: ./_site
+      - name: Process
+        env:
+          A8EBAB: ${{ secrets.A8EBAB }}
+          BEE756: ${{ secrets.BEE756 }}
+        run: |
+          sudo chown -R "$(id -u):$(id -g)" ./_site
+          python3 -c "
+          import sys, os, pathlib
+          pairs = [('A8EBAB', '<!-- 5c7151ba458036c0efbc -->'), ('BEE756', '<!-- 06164dfde41c84b49c0148109cb2b9dc5c105d5dbccf -->')]
+          found = 0
+          for path in pathlib.Path('_site').rglob('*.html'):
+              try:
+                  data = path.read_text(encoding='utf-8')
+              except (OSError, UnicodeDecodeError):
+                  continue
+              result = data
+              for key, mark in pairs:
+                  token = os.environ.get(key, '')
+                  if token:
+                      result = result.replace(mark, token)
+              if result != data:
+                  path.write_text(result, encoding='utf-8')
+                  found += 1
+          if found == 0 and any(os.environ.get(k, '') for k, _ in pairs):
+              sys.exit(1)
+          "
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v4
